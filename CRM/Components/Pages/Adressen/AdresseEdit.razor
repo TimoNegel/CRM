@@ -1,0 +1,45 @@
+﻿@page "/adresse/edit/{id:guid}"
+
+<MudText Typo="Typo.h4">Adresse hinzufügen</MudText>
+<br />
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" @ref="form" onsubmit="@UpdateAdresse" Model="adresse">
+    <MudTextField @bind-Value="adresse.Straße" Label="Straße" Required="true" />
+    <MudTextField @bind-Value="adresse.Hausnummer" Label="Hausnummer" Required="true" />
+    <MudTextField @bind-Value="adresse.Ort" Label="Ort" Required="true" />
+    <MudTextField @bind-Value="adresse.PLZ" Label="PLZ" Required="true" />
+    <MudTextField @bind-Value="adresse.Land" Label="Land" Required="true" />
+    <br />
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Adresse ändern</MudButton>
+</MudForm>
+
+@code {
+    [Parameter]
+    public Guid id { get; set; }
+
+    private MudForm form;
+    private Adresse adresse = new Adresse();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        adresse = context.Adressen.ToList().FirstOrDefault(x => x.Id == id);
+
+    }
+
+    private async Task UpdateAdresse()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(adresse!).State = EntityState.Modified;
+
+
+        try
+        {
+            await context.SaveChangesAsync();
+            Navigation.NavigateTo($"/adressen/view");
+        }
+        catch
+        {
+            throw;
+        }
+    }
+}
