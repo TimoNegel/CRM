@@ -8,10 +8,10 @@
         public decimal AuftragsValue { get; set; }
 
         public Guid KundenId { get; set; }
-        public virtual  Kunde Kunde { get; set; }
+        public virtual Kunde Kunde { get; set; } = new Kunde();
 
         public Guid StatusId { get; set; }
-        public virtual  Status Status { get; set; }
+        public virtual Status Status { get; set; } = new Status();
 
         // Many-to-Many mit Service
         public virtual ICollection<Service> Services { get; set; } = new List<Service>();

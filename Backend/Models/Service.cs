@@ -6,7 +6,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public  string ServiceName { get; set; }
+        public string ServiceName { get; set; } = string.Empty;
         public TimeSpan AufwandsZeit { get; set; }
         public decimal Preis { get; set; }
 

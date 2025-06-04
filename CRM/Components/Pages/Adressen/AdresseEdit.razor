@@ -2,7 +2,7 @@
 
 <MudText Typo="Typo.h4">Adresse hinzufügen</MudText>
 <br />
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" @ref="form" onsubmit="@UpdateAdresse" Model="adresse">
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateAdresse()" Model="adresse">
     <MudTextField @bind-Value="adresse.Strasse" Label="Straße" Required="true" />
     <MudTextField @bind-Value="adresse.Hausnummer" Label="Hausnummer" Required="true" />
     <MudTextField @bind-Value="adresse.Ort" Label="Ort" Required="true" />
@@ -16,13 +16,12 @@
     [Parameter]
     public Guid id { get; set; }
 
-    private MudForm form;
     private Adresse adresse = new Adresse();
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        adresse = context.Adressen.ToList().FirstOrDefault(x => x.Id == id);
+        using var context = await DbFactory.CreateDbContextAsync();
+        adresse = context.Adressen?.ToList().FirstOrDefault(x => x.Id == id) ?? new Adresse();
 
     }
 

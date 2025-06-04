@@ -23,7 +23,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
+        using var context = await DbFactory.CreateDbContextAsync();
         adressen = context.Adressen.ToList();
     }
 
