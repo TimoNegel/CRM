@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Backend.Data.Migrations
+namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class NewMigration : Migration
+    public partial class AddNewModels : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,8 +16,10 @@ namespace Backend.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PLZ = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Straße = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Strasse = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Hausnummer = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Ort = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Land = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -67,47 +69,80 @@ namespace Backend.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Services",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AufwandsZeit = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Preis = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Services", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Status",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Status", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Kunden",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Firmenname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Ansprechpartner = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Telefonnummer = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AnsprechpartnerVorname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AnsprechpartnerNachname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Tel = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AdresseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    AdressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Kunden", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Kunden_Adressen_AdresseId",
-                        column: x => x.AdresseId,
+                        name: "FK_Kunden_Adressen_AdressId",
+                        column: x => x.AdressId,
                         principalTable: "Adressen",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Mitarbeiters",
+                name: "Mitarbeiter",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Vorname = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Nachname = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Telefonnummer = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AdresseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    AdressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Mitarbeiters", x => x.Id);
+                    table.PrimaryKey("PK_Mitarbeiter", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Mitarbeiters_Adressen_AdresseId",
-                        column: x => x.AdresseId,
+                        name: "FK_Mitarbeiter_Adressen_AdressId",
+                        column: x => x.AdressId,
                         principalTable: "Adressen",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -223,40 +258,139 @@ namespace Backend.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    State = table.Column<int>(type: "int", nullable: false),
-                    AuftragsValue = table.Column<double>(type: "float", nullable: false),
-                    KundeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    AuftragsValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    KundenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Auftraege", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Auftraege_Kunden_KundeId",
+                        name: "FK_Auftraege_Kunden_KundenId",
+                        column: x => x.KundenId,
+                        principalTable: "Kunden",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Auftraege_Status_StatusId",
+                        column: x => x.StatusId,
+                        principalTable: "Status",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Angebote",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gesamtbetrag = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    KundeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MitarbeiterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Angebote", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Angebote_Kunden_KundeId",
                         column: x => x.KundeId,
                         principalTable: "Kunden",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Angebote_Mitarbeiter_MitarbeiterId",
+                        column: x => x.MitarbeiterId,
+                        principalTable: "Mitarbeiter",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "KontaktHistorien",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Datum = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Typ = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Notizen = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    KundeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MitarbeiterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KontaktHistorien", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_KontaktHistorien_Kunden_KundeId",
+                        column: x => x.KundeId,
+                        principalTable: "Kunden",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_KontaktHistorien_Mitarbeiter_MitarbeiterId",
+                        column: x => x.MitarbeiterId,
+                        principalTable: "Mitarbeiter",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AuftragService",
+                columns: table => new
+                {
+                    AuftraegeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServicesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuftragService", x => new { x.AuftraegeId, x.ServicesId });
+                    table.ForeignKey(
+                        name: "FK_AuftragService_Auftraege_AuftraegeId",
+                        column: x => x.AuftraegeId,
+                        principalTable: "Auftraege",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AuftragService_Services_ServicesId",
+                        column: x => x.ServicesId,
+                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Services",
+                name: "Rechnungen",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Aufwand = table.Column<TimeSpan>(type: "time", nullable: false),
-                    Preis = table.Column<double>(type: "float", nullable: false),
-                    AuftragId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Betrag = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Zahlungsstatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Zahlungsdatum = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AuftragId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    KundeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Services", x => x.Id);
+                    table.PrimaryKey("PK_Rechnungen", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Services_Auftraege_AuftragId",
+                        name: "FK_Rechnungen_Auftraege_AuftragId",
                         column: x => x.AuftragId,
                         principalTable: "Auftraege",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Rechnungen_Kunden_KundeId",
+                        column: x => x.KundeId,
+                        principalTable: "Kunden",
+                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Angebote_KundeId",
+                table: "Angebote",
+                column: "KundeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Angebote_MitarbeiterId",
+                table: "Angebote",
+                column: "MitarbeiterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -298,29 +432,57 @@ namespace Backend.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Auftraege_KundeId",
+                name: "IX_Auftraege_KundenId",
                 table: "Auftraege",
+                column: "KundenId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Auftraege_StatusId",
+                table: "Auftraege",
+                column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuftragService_ServicesId",
+                table: "AuftragService",
+                column: "ServicesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_KontaktHistorien_KundeId",
+                table: "KontaktHistorien",
                 column: "KundeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Kunden_AdresseId",
+                name: "IX_KontaktHistorien_MitarbeiterId",
+                table: "KontaktHistorien",
+                column: "MitarbeiterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Kunden_AdressId",
                 table: "Kunden",
-                column: "AdresseId");
+                column: "AdressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Mitarbeiters_AdresseId",
-                table: "Mitarbeiters",
-                column: "AdresseId");
+                name: "IX_Mitarbeiter_AdressId",
+                table: "Mitarbeiter",
+                column: "AdressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Services_AuftragId",
-                table: "Services",
+                name: "IX_Rechnungen_AuftragId",
+                table: "Rechnungen",
                 column: "AuftragId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rechnungen_KundeId",
+                table: "Rechnungen",
+                column: "KundeId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Angebote");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -337,10 +499,13 @@ namespace Backend.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Mitarbeiters");
+                name: "AuftragService");
 
             migrationBuilder.DropTable(
-                name: "Services");
+                name: "KontaktHistorien");
+
+            migrationBuilder.DropTable(
+                name: "Rechnungen");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -349,10 +514,19 @@ namespace Backend.Data.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "Services");
+
+            migrationBuilder.DropTable(
+                name: "Mitarbeiter");
+
+            migrationBuilder.DropTable(
                 name: "Auftraege");
 
             migrationBuilder.DropTable(
                 name: "Kunden");
+
+            migrationBuilder.DropTable(
+                name: "Status");
 
             migrationBuilder.DropTable(
                 name: "Adressen");

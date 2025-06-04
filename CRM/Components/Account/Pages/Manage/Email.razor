@@ -7,8 +7,8 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using CRM.Data
 
-@inject UserManager<ApplicationUser> UserManager
-@inject IEmailSender<ApplicationUser> EmailSender
+@inject UserManager<CrmUser> UserManager
+@inject IEmailSender<CrmUser> EmailSender
 @inject IdentityUserAccessor UserAccessor
 @inject NavigationManager NavigationManager
 
@@ -54,7 +54,7 @@
 
 @code {
     private string? message;
-    private ApplicationUser user = default!;
+    private CrmUser user = default!;
     private string? email;
     private bool isEmailConfirmed;
 

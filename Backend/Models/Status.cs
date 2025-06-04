@@ -1,16 +1,14 @@
 ﻿namespace Backend.Models
 {
-    public class Service
+    public class Status
     {
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public  string ServiceName { get; set; }
-        public TimeSpan AufwandsZeit { get; set; }
-        public decimal Preis { get; set; }
+        public  string Name { get; set; }
 
-        // Many-to-Many mit Auftrag
+        // Navigation Properties
         public virtual ICollection<Auftrag> Auftraege { get; set; } = new List<Auftrag>();
     }
 }

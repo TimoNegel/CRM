@@ -12,11 +12,12 @@
 @using Microsoft.JSInterop
 @using MudBlazor
 @using MudBlazor.Services
+
+
 @using CRM
 @using CRM.Components
-@using CRM.Models
-@using Backend.Data
+@using Backend.Models
 
-@inject IDbContextFactory<ApplicationDbContext> DbFactory;
+@inject IDbContextFactory<CrmDbContext> DbFactory;
 @inject NavigationManager Navigation
 

@@ -4,7 +4,7 @@
 @using CRM.Data
 @using MudBlazor.StaticInput
 
-@inject SignInManager<ApplicationUser> SignInManager
+@inject SignInManager<CrmUser> SignInManager
 @inject IdentityRedirectManager RedirectManager
 
 @if (externalLogins.Length == 0)
