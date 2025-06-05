@@ -1,0 +1,45 @@
+﻿@page "/auftrag/view/{id}"
+
+<MudText Typo="Typo.h4">Auftrag Details</MudText>
+<br />
+
+<MudCard>
+    <MudCardContent>
+        <MudText><b>Auftragswert:</b> @auftrag.AuftragsValue €</MudText>
+        <MudText><b>Kunde:</b> @auftrag.Kunde.Firmenname</MudText>
+        <MudText><b>Status:</b> @auftrag.Status.Name</MudText>
+    </MudCardContent>
+
+    <MudCardActions>
+        <MudButton Color="Color.Primary" OnClick="() => NavigateToEditAuftragPage()">Bearbeiten</MudButton>
+        <MudButton Color="Color.Error" OnClick="() => DeleteAuftrag()">Löschen</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private Auftrag auftrag = new Auftrag();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        auftrag = await context.Auftraege.Include(a => a.Kunde).Include(a => a.Status).FirstOrDefaultAsync(a => a.Id == Id);
+    }
+
+    private void NavigateToEditAuftragPage()
+    {
+        Navigation.NavigateTo($"/auftrag/edit/{Id}");
+    }
+
+    private async Task DeleteAuftrag()
+    {
+        using var context = DbFactory.CreateDbContext();
+        var auftragToDelete = context.Auftraege.FirstOrDefault(a => a.Id == Id);
+        if (auftragToDelete != null)
+        {
+            context.Auftraege.Remove(auftragToDelete);
+            await context.SaveChangesAsync();
+            Navigation.NavigateTo("/auftraege/view");
+        }
+    }
+}

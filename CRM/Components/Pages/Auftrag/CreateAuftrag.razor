@@ -1,0 +1,50 @@
+﻿@page "/auftrag/create"
+
+<MudText Typo="Typo.h4">Auftrag hinzufügen</MudText>
+<br />
+
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddAuftrag()" Model="auftrag">
+    <MudTextField @bind-Value="auftrag.AuftragsValue" Label="Auftragswert" Required="true" />
+    <MudSelect @bind-Value="auftrag.KundenId" Label="Kunde" Required="true">
+        @foreach (var k in kundenListe)
+        {
+            <MudSelectItem Value="@k.Id">@k.Firmenname</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudSelect @bind-Value="auftrag.StatusId" Label="Status" Required="true">
+        @foreach (var s in statusListe)
+        {
+            <MudSelectItem Value="@s.Id">@s.Name</MudSelectItem>
+        }
+    </MudSelect>
+
+    <br />
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+        Auftrag hinzufügen
+    </MudButton>
+</MudForm>
+
+@code {
+    private Auftrag auftrag = new Auftrag();
+    private List<Kunde> kundenListe = new List<Kunde>();
+    private List<Status> statusListe = new List<Status>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        kundenListe = await context.Kunden.ToListAsync();
+        statusListe = await context.Status.ToListAsync();
+    }
+
+    private async Task AddAuftrag()
+    {
+        auftrag.Id = Guid.NewGuid();
+
+        using var context = DbFactory.CreateDbContext();
+        context.Auftraege.Add(auftrag);
+        await context.SaveChangesAsync();
+
+        Navigation.NavigateTo($"/auftraege/view");
+    }
+}

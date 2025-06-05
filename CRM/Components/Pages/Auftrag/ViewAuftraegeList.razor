@@ -1,0 +1,50 @@
+﻿@page "/auftraege/view"
+
+<MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateAuftragPage()">Auftrag hinzufügen</MudButton>
+
+<MudDataGrid Items="@auftragsListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default">
+    <Columns>
+        <PropertyColumn Property="x => x.AuftragsValue" Label="Auftragswert" />
+        <PropertyColumn Property="x => x.Kunde.Firmenname" Label="Kunde" />
+        <PropertyColumn Property="x => x.Status.Name" Label="Status" />
+        <TemplateColumn CellClass="d-flex justify-center">
+            <CellTemplate Context="context">
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditAuftragPage(context.Item.Id)" />
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteAuftrag(context.Item.Id)" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private List<Auftrag> auftragsListe = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        auftragsListe = await context.Auftraege.Include(a => a.Kunde).Include(a => a.Status).ToListAsync();
+    }
+
+    private async Task DeleteAuftrag(Guid auftragId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var auftrag = context.Auftraege.FirstOrDefault(a => a.Id == auftragId);
+        if (auftrag != null)
+        {
+            context.Auftraege.Remove(auftrag);
+            await context.SaveChangesAsync();
+            auftragsListe = context.Auftraege.ToList();
+            StateHasChanged();
+        }
+    }
+
+    private void NavigateToEditAuftragPage(Guid id)
+    {
+        Navigation.NavigateTo($"/auftrag/edit/{id}");
+    }
+
+    private void NavigateToCreateAuftragPage()
+    {
+        Navigation.NavigateTo($"/auftrag/create");
+    }
+}

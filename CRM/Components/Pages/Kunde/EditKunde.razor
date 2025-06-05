@@ -1,0 +1,44 @@
+﻿@page "/kunde/edit/{id}"
+
+<MudText Typo="Typo.h4">Kunde bearbeiten</MudText>
+<br />
+
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateKunde()" Model="kunde">
+    <MudTextField @bind-Value="kunde.Firmenname" Label="Firmenname" Required="true" />
+    <MudTextField @bind-Value="kunde.AnsprechpartnerVorname" Label="Ansprechpartner Vorname" Required="true" />
+    <MudTextField @bind-Value="kunde.AnsprechpartnerNachname" Label="Ansprechpartner Nachname" Required="true" />
+    <MudTextField @bind-Value="kunde.Tel" Label="Telefonnummer" Required="true" />
+    <MudTextField @bind-Value="kunde.Email" Label="E-Mail" Required="true" />
+
+    <MudText Typo="Typo.h5">Adresse</MudText>
+    <MudTextField @bind-Value="kunde.Adresse.Strasse" Label="Straße" Required="true" />
+    <MudTextField @bind-Value="kunde.Adresse.Hausnummer" Label="Hausnummer" Required="true" />
+    <MudTextField @bind-Value="kunde.Adresse.Ort" Label="Ort" Required="true" />
+    <MudTextField @bind-Value="kunde.Adresse.PLZ" Label="PLZ" Required="true" />
+    <MudTextField @bind-Value="kunde.Adresse.Land" Label="Land" Required="true" />
+
+    <br />
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+        Änderungen speichern
+    </MudButton>
+</MudForm>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private Kunde kunde = new Kunde { Adresse = new Adresse() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        kunde = await context.Kunden.Include(k => k.Adresse).FirstOrDefaultAsync(k => k.Id == Id) ?? new Kunde();
+    }
+
+    private async Task UpdateKunde()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Kunden.Update(kunde);
+        await context.SaveChangesAsync();
+
+        Navigation.NavigateTo($"/kunden/view");
+    }
+}

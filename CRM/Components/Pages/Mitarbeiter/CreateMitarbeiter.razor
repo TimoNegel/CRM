@@ -1,0 +1,40 @@
+﻿@page "/mitarbeiter/create"
+
+<MudText Typo="Typo.h4">Mitarbeiter hinzufügen</MudText>
+<br />
+
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddMitarbeiter()" Model="mitarbeiter">
+    <MudTextField @bind-Value="mitarbeiter.Vorname" Label="Vorname" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Nachname" Label="Nachname" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Email" Label="E-Mail" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Telefonnummer" Label="Telefonnummer" Required="true" />
+
+    <MudText Typo="Typo.h5">Adresse</MudText>
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Strasse" Label="Straße" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Hausnummer" Label="Hausnummer" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Ort" Label="Ort" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.PLZ" Label="PLZ" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Land" Label="Land" Required="true" />
+
+    <br />
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+        Mitarbeiter hinzufügen
+    </MudButton>
+</MudForm>
+
+@code {
+    private Mitarbeiter mitarbeiter = new Mitarbeiter { Adresse = new Adresse() };
+
+    private async Task AddMitarbeiter()
+    {
+        mitarbeiter.Id = Guid.NewGuid();
+        mitarbeiter.Adresse.Id = Guid.NewGuid();
+
+        using var context = DbFactory.CreateDbContext();
+        context.Adressen.Add(mitarbeiter.Adresse);
+        context.Mitarbeiter.Add(mitarbeiter);
+        await context.SaveChangesAsync();
+
+        Navigation.NavigateTo($"/mitarbeiter/view");
+    }
+}

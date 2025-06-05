@@ -1,0 +1,41 @@
+﻿@page "/kunde/create"
+
+<MudText Typo="Typo.h4">Kunde hinzufügen</MudText>
+<br />
+
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@(() => AddKunde)" Model="kunde">
+    <MudTextField @bind-Value="kunde.Firmenname" Label="Firmenname" Required="true" />
+    <MudTextField @bind-Value="kunde.AnsprechpartnerVorname" Label="Ansprechpartner Vorname" Required="true" />
+    <MudTextField @bind-Value="kunde.AnsprechpartnerNachname" Label="Ansprechpartner Nachname" Required="true" />
+    <MudTextField @bind-Value="kunde.Tel" Label="Telefonnummer" Required="true" />
+    <MudTextField @bind-Value="kunde.Email" Label="E-Mail" Required="true" />
+
+    <MudText Typo="Typo.h5">Adresse</MudText>
+    <MudTextField @bind-Value="kunde.Adresse.Strasse" Label="Straße" Required="true" />
+    <MudTextField @bind-Value="kunde.Adresse.Hausnummer" Label="Hausnummer" Required="true" />
+    <MudTextField @bind-Value="kunde.Adresse.Ort" Label="Ort" Required="true" />
+    <MudTextField @bind-Value="kunde.Adresse.PLZ" Label="PLZ" Required="true" />
+    <MudTextField @bind-Value="kunde.Adresse.Land" Label="Land" Required="true" />
+
+    <br />
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+        Kunde hinzufügen
+    </MudButton>
+</MudForm>
+
+@code {
+    private Kunde kunde = new Kunde { Adresse = new Adresse() };
+
+    private async Task AddKunde()
+    {
+        kunde.Id = Guid.NewGuid();
+        kunde.Adresse.Id = Guid.NewGuid();
+
+        using var context = DbFactory.CreateDbContext();
+        context.Adressen.Add(kunde.Adresse);
+        context.Kunden.Add(kunde);
+        await context.SaveChangesAsync();
+
+        Navigation.NavigateTo($"/kunden/view");
+    }
+}

@@ -1,0 +1,45 @@
+﻿@page "/service/view/{id}"
+
+<MudText Typo="Typo.h4">Service Details</MudText>
+<br />
+
+<MudCard>
+    <MudCardContent>
+        <MudText><b>Name:</b> @service.ServiceName</MudText>
+        <MudText><b>Aufwandszeit:</b> @service.AufwandsZeit</MudText>
+        <MudText><b>Preis:</b> @service.Preis €</MudText>
+    </MudCardContent>
+
+    <MudCardActions>
+        <MudButton Color="Color.Primary" OnClick="() => NavigateToEditServicePage()">Bearbeiten</MudButton>
+        <MudButton Color="Color.Error" OnClick="() => DeleteService()">Löschen</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private Service service = new Service();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        service = await context.Services.FirstOrDefaultAsync(s => s.Id == Id) ?? new Service();
+    }
+
+    private void NavigateToEditServicePage()
+    {
+        Navigation.NavigateTo($"/service/edit/{Id}");
+    }
+
+    private async Task DeleteService()
+    {
+        using var context = DbFactory.CreateDbContext();
+        var serviceToDelete = context.Services.FirstOrDefault(s => s.Id == Id);
+        if (serviceToDelete != null)
+        {
+            context.Services.Remove(serviceToDelete);
+            await context.SaveChangesAsync();
+            Navigation.NavigateTo("/services/view");
+        }
+    }
+}

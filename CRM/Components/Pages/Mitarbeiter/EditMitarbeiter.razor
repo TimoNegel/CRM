@@ -1,0 +1,43 @@
+﻿@page "/mitarbeiter/edit/{id}"
+
+<MudText Typo="Typo.h4">Mitarbeiter bearbeiten</MudText>
+<br />
+
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateMitarbeiter()" Model="mitarbeiter">
+    <MudTextField @bind-Value="mitarbeiter.Vorname" Label="Vorname" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Nachname" Label="Nachname" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Email" Label="E-Mail" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Telefonnummer" Label="Telefonnummer" Required="true" />
+
+    <MudText Typo="Typo.h5">Adresse</MudText>
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Strasse" Label="Straße" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Hausnummer" Label="Hausnummer" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Ort" Label="Ort" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.PLZ" Label="PLZ" Required="true" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Land" Label="Land" Required="true" />
+
+    <br />
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+        Änderungen speichern
+    </MudButton>
+</MudForm>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private Mitarbeiter mitarbeiter = new Mitarbeiter { Adresse = new Adresse() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        mitarbeiter = await context.Mitarbeiter.Include(m => m.Adresse).FirstOrDefaultAsync(m => m.Id == Id) ?? new Mitarbeiter();
+    }
+
+    private async Task UpdateMitarbeiter()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Mitarbeiter.Update(mitarbeiter);
+        await context.SaveChangesAsync();
+
+        Navigation.NavigateTo($"/mitarbeiter/view");
+    }
+}

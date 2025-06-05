@@ -1,0 +1,53 @@
+﻿@page "/mitarbeiter/view/{id}"
+
+<MudText Typo="Typo.h4">Mitarbeiter Details</MudText>
+<br />
+
+<MudCard>
+    <MudCardContent>
+        <MudText><b>Vorname:</b> @mitarbeiter.Vorname</MudText>
+        <MudText><b>Nachname:</b> @mitarbeiter.Nachname</MudText>
+        <MudText><b>E-Mail:</b> @mitarbeiter.Email</MudText>
+        <MudText><b>Telefonnummer:</b> @mitarbeiter.Telefonnummer</MudText>
+
+        <MudText Typo="Typo.h5">Adresse</MudText>
+        <MudText><b>Straße:</b> @mitarbeiter.Adresse.Strasse</MudText>
+        <MudText><b>Hausnummer:</b> @mitarbeiter.Adresse.Hausnummer</MudText>
+        <MudText><b>Ort:</b> @mitarbeiter.Adresse.Ort</MudText>
+        <MudText><b>PLZ:</b> @mitarbeiter.Adresse.PLZ</MudText>
+        <MudText><b>Land:</b> @mitarbeiter.Adresse.Land</MudText>
+    </MudCardContent>
+
+    <MudCardActions>
+        <MudButton Color="Color.Primary" OnClick="() => NavigateToEditMitarbeiterPage()">Bearbeiten</MudButton>
+        <MudButton Color="Color.Error" OnClick="() => DeleteMitarbeiter()">Löschen</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private Mitarbeiter mitarbeiter = new Mitarbeiter { Adresse = new Adresse() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        mitarbeiter = await context.Mitarbeiter.Include(m => m.Adresse).FirstOrDefaultAsync(m => m.Id == Id) ?? new Mitarbeiter();
+    }
+
+    private void NavigateToEditMitarbeiterPage()
+    {
+        Navigation.NavigateTo($"/mitarbeiter/edit/{Id}");
+    }
+
+    private async Task DeleteMitarbeiter()
+    {
+        using var context = DbFactory.CreateDbContext();
+        var mitarbeiterToDelete = context.Mitarbeiter.FirstOrDefault(m => m.Id == Id);
+        if (mitarbeiterToDelete != null)
+        {
+            context.Mitarbeiter.Remove(mitarbeiterToDelete);
+            await context.SaveChangesAsync();
+            Navigation.NavigateTo("/mitarbeiter/view");
+        }
+    }
+}

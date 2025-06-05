@@ -1,0 +1,54 @@
+﻿@page "/kunden/view"
+
+<MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateKundePage()">Kunde hinzufügen</MudButton>
+
+<MudDataGrid Items="@kundenListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default">
+    <Columns>
+        <PropertyColumn Property="x => x.Firmenname" />
+        <PropertyColumn Property="x => x.AnsprechpartnerVorname" />
+        <PropertyColumn Property="x => x.AnsprechpartnerNachname" />
+        <PropertyColumn Property="x => x.Tel" />
+        <PropertyColumn Property="x => x.Email" />
+        <PropertyColumn Property="x => x.Adresse.Ort" />
+        <PropertyColumn Property="x => x.Adresse.PLZ" />
+        <TemplateColumn CellClass="d-flex justify-center">
+            <CellTemplate Context="context">
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditKundePage(context.Item.Id)" />
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteKunde(context.Item.Id)" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private List<Kunde> kundenListe = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        kundenListe = await context.Kunden.Include(k => k.Adresse).ToListAsync();
+    }
+
+    private async Task DeleteKunde(Guid kundeId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var kunde = context.Kunden.FirstOrDefault(k => k.Id == kundeId);
+        if (kunde != null)
+        {
+            context.Kunden.Remove(kunde);
+            await context.SaveChangesAsync();
+            kundenListe = context.Kunden.ToList();
+            StateHasChanged();
+        }
+    }
+
+    private void NavigateToEditKundePage(Guid id)
+    {
+        Navigation.NavigateTo($"/kunde/edit/{id}");
+    }
+
+    private void NavigateToCreateKundePage()
+    {
+        Navigation.NavigateTo($"/kunde/create");
+    }
+}
