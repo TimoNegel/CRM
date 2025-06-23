@@ -2,7 +2,7 @@
 
 <MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateKundePage()">Kunde hinzufügen</MudButton>
 
-<MudDataGrid Items="@kundenListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default">
+<MudDataGrid T="Kunde" Items="@kundenListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default" RowClick="@((context) => NavigateToViewKundePage(context.Item.Id))">
     <Columns>
         <PropertyColumn Property="x => x.Firmenname" />
         <PropertyColumn Property="x => x.AnsprechpartnerVorname" />
@@ -50,5 +50,10 @@
     private void NavigateToCreateKundePage()
     {
         Navigation.NavigateTo($"/kunde/create");
+    }
+
+    private void NavigateToViewKundePage(Guid id)
+    {
+        Navigation.NavigateTo($"/kunde/view/{id}");
     }
 }

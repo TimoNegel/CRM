@@ -3,14 +3,12 @@
 <MudText Typo="Typo.h4">Kunde hinzufügen</MudText>
 <br />
 
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@(() => AddKunde)" Model="kunde">
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddKunde" Model="kunde">
     <MudTextField @bind-Value="kunde.Firmenname" Label="Firmenname" Required="true" />
     <MudTextField @bind-Value="kunde.AnsprechpartnerVorname" Label="Ansprechpartner Vorname" Required="true" />
     <MudTextField @bind-Value="kunde.AnsprechpartnerNachname" Label="Ansprechpartner Nachname" Required="true" />
     <MudTextField @bind-Value="kunde.Tel" Label="Telefonnummer" Required="true" />
     <MudTextField @bind-Value="kunde.Email" Label="E-Mail" Required="true" />
-
-    <MudText Typo="Typo.h5">Adresse</MudText>
     <MudTextField @bind-Value="kunde.Adresse.Strasse" Label="Straße" Required="true" />
     <MudTextField @bind-Value="kunde.Adresse.Hausnummer" Label="Hausnummer" Required="true" />
     <MudTextField @bind-Value="kunde.Adresse.Ort" Label="Ort" Required="true" />
