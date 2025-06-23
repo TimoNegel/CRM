@@ -1,21 +1,32 @@
-﻿@page "/auftrag/edit/{id}"
+﻿@page "/auftrag/edit/{Id:guid}"
 
 <MudText Typo="Typo.h4">Auftrag bearbeiten</MudText>
 <br />
 
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateAuftrag()" Model="auftrag">
-    <MudTextField @bind-Value="auftrag.AuftragsValue" Label="Auftragswert" Required="true" />
-    <MudSelect @bind-Value="auftrag.KundenId" Label="Kunde" Required="true">
-        @foreach (var k in kundenListe)
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateAuftrag" Model="auftrag">
+    <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true" Placeholder="-">
+        @foreach(var k in kundenListe)
         {
-            <MudSelectItem Value="@k.Id">@k.Firmenname</MudSelectItem>
+            <MudSelectItem Value="@k">@k.Firmenname</MudSelectItem>
         }
     </MudSelect>
 
-    <MudSelect @bind-Value="auftrag.StatusId" Label="Status" Required="true">
-        @foreach (var s in statusListe)
+    <MudSelect T="Service"
+               Label="Services"
+               Required="true"
+               MultiSelection="true"
+               @bind-SelectedValues="selectedServices"
+               Placeholder="-">
+        @foreach(var s in serviceListe)
         {
-            <MudSelectItem Value="@s.Id">@s.Name</MudSelectItem>
+            <MudSelectItem Value="@s">@s.ServiceName</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudSelect @bind-Value="auftrag.Status" Label="Status" Required="true" Placeholder="-">
+        @foreach(var s in statusListe)
+        {
+            <MudSelectItem Value="@s">@s.Name</MudSelectItem>
         }
     </MudSelect>
 
@@ -30,6 +41,9 @@
     private Auftrag auftrag = new Auftrag();
     private List<Kunde> kundenListe = new List<Kunde>();
     private List<Status> statusListe = new List<Status>();
+    private List<Service> serviceListe = new List<Service>();
+    private IEnumerable<Service> selectedServices = new HashSet<Service>();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -37,14 +51,51 @@
         auftrag = await context.Auftraege.FirstOrDefaultAsync(a => a.Id == Id) ?? new Auftrag();
         kundenListe = await context.Kunden.ToListAsync();
         statusListe = await context.Status.ToListAsync();
+        serviceListe = await context.Services.ToListAsync();
+        selectedServices = auftrag.Services ?? new HashSet<Service>();
+
     }
 
     private async Task UpdateAuftrag()
     {
         using var context = DbFactory.CreateDbContext();
-        context.Auftraege.Update(auftrag);
-        await context.SaveChangesAsync();
 
+        // Auftrag mit seinen aktuellen Services laden
+        var existingAuftrag = await context.Auftraege
+            .Include(a => a.Services)
+            .FirstOrDefaultAsync(a => a.Id == auftrag.Id);
+
+        if(existingAuftrag == null)
+        {
+            // Fehlerbehandlung, falls Auftrag nicht gefunden wurde
+            return;
+        }
+
+        // Bestehende Services entfernen
+        existingAuftrag.Services.Clear();
+
+        // Neue Services aus dem Kontext laden
+        var neueServices = await context.Services
+            .Where(s => selectedServices.Select(sel => sel.Id).Contains(s.Id))
+            .ToListAsync();
+
+        foreach(var service in neueServices)
+        {
+            existingAuftrag.Services.Add(service);
+        }
+
+        // Kunde und Status aktualisieren
+        existingAuftrag.Kunde = await context.Kunden
+            .FirstOrDefaultAsync(k => k.Id == auftrag.Kunde.Id);
+
+        existingAuftrag.Status = await context.Status
+            .FirstOrDefaultAsync(s => s.Id == auftrag.Status.Id);
+
+        // Auftragswert berechnen
+        existingAuftrag.AuftragsValue = existingAuftrag.Services.Sum(s => s.Preis);
+
+        await context.SaveChangesAsync();
+        
         Navigation.NavigateTo($"/auftraege/view");
     }
 }

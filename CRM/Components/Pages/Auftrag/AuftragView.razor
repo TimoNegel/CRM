@@ -1,4 +1,4 @@
-﻿@page "/auftrag/view/{id}"
+﻿@page "/auftrag/view/{Id:guid}"
 
 <MudText Typo="Typo.h4">Auftrag Details</MudText>
 <br />
@@ -8,6 +8,13 @@
         <MudText><b>Auftragswert:</b> @auftrag.AuftragsValue €</MudText>
         <MudText><b>Kunde:</b> @auftrag.Kunde.Firmenname</MudText>
         <MudText><b>Status:</b> @auftrag.Status.Name</MudText>
+        <MudText><b>Services:</b></MudText>
+        @foreach(var service in auftrag.Services)
+        {
+            <MudText><b>Name:</b> @service.ServiceName  <b>Value:</b> @service.Preis</MudText>
+        }
+
+        
     </MudCardContent>
 
     <MudCardActions>
@@ -23,7 +30,7 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        auftrag = await context.Auftraege.Include(a => a.Kunde).Include(a => a.Status).FirstOrDefaultAsync(a => a.Id == Id);
+        auftrag = await context.Auftraege.Include(a => a.Kunde).Include(a => a.Status).Include(a => a.Services).FirstOrDefaultAsync(a => a.Id == Id);
     }
 
     private void NavigateToEditAuftragPage()

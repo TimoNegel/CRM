@@ -2,10 +2,10 @@
 
 <MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateAuftragPage()">Auftrag hinzufügen</MudButton>
 
-<MudDataGrid Items="@auftragsListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default">
+<MudDataGrid T="Auftrag" Items="@auftragsListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default" RowClick="@((context) => NavigateToViewAuftragPage(context.Item.Id))">
     <Columns>
+        <PropertyColumn Property="x => x.Kunde.Firmenname" Label="Kundenname" />
         <PropertyColumn Property="x => x.AuftragsValue" Label="Auftragswert" />
-        <PropertyColumn Property="x => x.Kunde.Firmenname" Label="Kunde" />
         <PropertyColumn Property="x => x.Status.Name" Label="Status" />
         <TemplateColumn CellClass="d-flex justify-center">
             <CellTemplate Context="context">
@@ -46,5 +46,10 @@
     private void NavigateToCreateAuftragPage()
     {
         Navigation.NavigateTo($"/auftrag/create");
+    }
+
+    private void NavigateToViewAuftragPage(Guid id)
+    {
+        Navigation.NavigateTo($"/auftrag/view/{id}");
     }
 }

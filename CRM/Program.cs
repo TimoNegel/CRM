@@ -1,3 +1,4 @@
+using Backend.Services;
 using CRM.Components;
 using CRM.Components.Account;
 using CRM.Data;
@@ -45,8 +46,12 @@ builder.Services.AddSingleton<IEmailSender<CrmUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
 
+//Database initialization
+DbInitializer.Seed(app.Services);
+
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if(app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
 }

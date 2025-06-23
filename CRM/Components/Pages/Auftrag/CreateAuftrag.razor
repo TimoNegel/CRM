@@ -3,19 +3,27 @@
 <MudText Typo="Typo.h4">Auftrag hinzufügen</MudText>
 <br />
 
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddAuftrag()" Model="auftrag">
-    <MudTextField @bind-Value="auftrag.AuftragsValue" Label="Auftragswert" Required="true" />
-    <MudSelect @bind-Value="auftrag.KundenId" Label="Kunde" Required="true">
-        @foreach (var k in kundenListe)
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddAuftrag" Model="auftrag">
+
+    <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true" Placeholder="-">
+        @foreach(var k in kundenListe)
         {
-            <MudSelectItem Value="@k.Id">@k.Firmenname</MudSelectItem>
+            <MudSelectItem Value="@k">@k.Firmenname</MudSelectItem>
         }
     </MudSelect>
 
-    <MudSelect @bind-Value="auftrag.StatusId" Label="Status" Required="true">
-        @foreach (var s in statusListe)
+    <MudSelect T="Service" Label="Services" Required="true" MultiSelection="true" @bind-SelectedValues="selectedServices">
+       
+        @foreach(var s in serviceListe)
         {
-            <MudSelectItem Value="@s.Id">@s.Name</MudSelectItem>
+            <MudSelectItem Value="@s">@s.ServiceName</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudSelect @bind-Value="auftrag.Status" Label="Status" Required="true" Placeholder="-">
+        @foreach(var s in statusListe)
+        {
+            <MudSelectItem Value="@s">@s.Name</MudSelectItem>
         }
     </MudSelect>
 
@@ -29,20 +37,40 @@
     private Auftrag auftrag = new Auftrag();
     private List<Kunde> kundenListe = new List<Kunde>();
     private List<Status> statusListe = new List<Status>();
+    private List<Service> serviceListe = new List<Service>();
+    private IEnumerable<Service> selectedServices = new HashSet<Service>();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
         kundenListe = await context.Kunden.ToListAsync();
         statusListe = await context.Status.ToListAsync();
+        serviceListe = await context.Services.ToListAsync();
     }
 
     private async Task AddAuftrag()
     {
+        using var context = DbFactory.CreateDbContext();
+
         auftrag.Id = Guid.NewGuid();
 
-        using var context = DbFactory.CreateDbContext();
-        context.Auftraege.Add(auftrag);
+        // Services aus dem Kontext laden
+        auftrag.Services = await context.Services
+            .Where(s => selectedServices.Select(s => s.Id).ToList().Contains(s.Id))
+            .ToListAsync();
+
+        // Kunde aus dem Kontext laden
+        auftrag.Kunde = await context.Kunden
+            .FirstOrDefaultAsync(k => k.Id == auftrag.Kunde.Id);
+
+        // Status aus dem Kontext laden
+        auftrag.Status = await context.Status
+            .FirstOrDefaultAsync(s => s.Id == auftrag.Status.Id);
+
+        // Auftragswert berechnen
+        auftrag.AuftragsValue = auftrag.Services.Sum(s => s.Preis);
+
+        await context.Auftraege.AddAsync(auftrag);
         await context.SaveChangesAsync();
 
         Navigation.NavigateTo($"/auftraege/view");
