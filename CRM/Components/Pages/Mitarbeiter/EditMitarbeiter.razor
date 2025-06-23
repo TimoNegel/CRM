@@ -1,15 +1,13 @@
-﻿@page "/mitarbeiter/edit/{id}"
+﻿@page "/mitarbeiter/edit/{Id:guid}"
 
 <MudText Typo="Typo.h4">Mitarbeiter bearbeiten</MudText>
 <br />
 
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateMitarbeiter()" Model="mitarbeiter">
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateMitarbeiter" Model="mitarbeiter">
     <MudTextField @bind-Value="mitarbeiter.Vorname" Label="Vorname" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Nachname" Label="Nachname" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Email" Label="E-Mail" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Telefonnummer" Label="Telefonnummer" Required="true" />
-
-    <MudText Typo="Typo.h5">Adresse</MudText>
     <MudTextField @bind-Value="mitarbeiter.Adresse.Strasse" Label="Straße" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Adresse.Hausnummer" Label="Hausnummer" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Adresse.Ort" Label="Ort" Required="true" />

@@ -2,14 +2,13 @@
 
 <MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateMitarbeiterPage()">Mitarbeiter hinzufügen</MudButton>
 
-<MudDataGrid Items="@mitarbeiterListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default">
+<MudDataGrid T="Mitarbeiter" Items="@mitarbeiterListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default" RowClick="@((context) => NavigateToViewMitarbeiterPage(context.Item.Id))">
     <Columns>
         <PropertyColumn Property="x => x.Vorname" />
         <PropertyColumn Property="x => x.Nachname" />
         <PropertyColumn Property="x => x.Email" />
         <PropertyColumn Property="x => x.Telefonnummer" />
-        <PropertyColumn Property="x => x.Adresse.Ort" />
-        <PropertyColumn Property="x => x.Adresse.PLZ" />
+        <PropertyColumn Property="x => x.Adresse.FormatierteAdresse" />
         <TemplateColumn CellClass="d-flex justify-center">
             <CellTemplate Context="context">
                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditMitarbeiterPage(context.Item.Id)" />
@@ -44,6 +43,11 @@
     private void NavigateToEditMitarbeiterPage(Guid id)
     {
         Navigation.NavigateTo($"/mitarbeiter/edit/{id}");
+    }
+
+    private void NavigateToViewMitarbeiterPage(Guid id)
+    {
+        Navigation.NavigateTo($"/mitarbeiter/view/{id}");
     }
 
     private void NavigateToCreateMitarbeiterPage()
