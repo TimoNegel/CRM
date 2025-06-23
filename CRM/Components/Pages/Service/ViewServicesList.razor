@@ -2,7 +2,7 @@
 
 <MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateServicePage()">Service hinzufügen</MudButton>
 
-<MudDataGrid Items="@servicesListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default">
+<MudDataGrid T="Service" Items="@servicesListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default" RowClick="@((context) => NavigateToViewServicePage(context.Item.Id))">
     <Columns>
         <PropertyColumn Property="x => x.ServiceName" />
         <PropertyColumn Property="x => x.AufwandsZeit" />
@@ -46,5 +46,11 @@
     private void NavigateToCreateServicePage()
     {
         Navigation.NavigateTo($"/service/create");
+    }
+
+
+    private void NavigateToViewServicePage(Guid id)
+    {
+        Navigation.NavigateTo($"/service/view/{id}");
     }
 }

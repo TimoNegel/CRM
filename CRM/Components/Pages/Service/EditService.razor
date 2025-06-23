@@ -1,9 +1,9 @@
-﻿@page "/service/edit/{id}"
+﻿@page "/service/edit/{Id:guid}"
 
 <MudText Typo="Typo.h4">Service bearbeiten</MudText>
 <br />
 
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateService()" Model="service">
+<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateService" Model="service">
     <MudTextField @bind-Value="service.ServiceName" Label="Service Name" Required="true" />
     <MudTextField @bind-Value="service.AufwandsZeit" Label="Aufwandszeit (hh:mm:ss)" Required="true" />
     <MudTextField @bind-Value="service.Preis" Label="Preis" Required="true" />
