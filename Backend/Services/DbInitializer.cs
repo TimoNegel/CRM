@@ -11,13 +11,13 @@ namespace Backend.Services
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
 
-            //context.Database.Migrate(); // optional: wendet Migrationen an
-
             if(!context.Status.Any())
             {
                 context.Status.AddRange(
-                    new Status { Name = "Start", Id = Guid.NewGuid() },
-                                        new Status { Name = "Ende", Id = Guid.NewGuid() }
+                    new Status { Name = "Lead", Id = Guid.NewGuid(), Position = "1" },
+                    new Status { Name = "Kontakt", Id = Guid.NewGuid(), Position = "2" },
+                    new Status { Name = "Verhandlung", Id = Guid.NewGuid(), Position = "3" },
+                    new Status { Name = "Abschluss", Id = Guid.NewGuid(), Position = "4" }
 
                 );
                 context.SaveChanges();

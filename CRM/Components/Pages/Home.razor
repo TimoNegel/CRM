@@ -1,2 +1,64 @@
 ﻿@page "/"
 
+<div style="overflow-x: auto; white-space: nowrap;">
+    <MudDropContainer T="Backend.Models.Auftrag"
+                      Items="auftragListe"
+                      ItemsSelector="@((item, dropzone) => item.Status.Position == dropzone)"
+                      ItemDropped="@OnItemDropped"
+                      Class="d-inline-flex flex-nowrap px-2"
+                      Style="min-height: 400px;">
+        <ChildContent>
+            @foreach(var status in statusListe)
+            {
+                <MudPaper Class="ma-2 pa-2 d-inline-block" Style="min-width: 280px; max-width: 320px;">
+                    <MudList T="string" Class="d-flex flex-column mud-height-full">
+                        <MudListSubheader>@status.Name</MudListSubheader>
+                        <MudDropZone T="Backend.Models.Auftrag" Identifier="@status.Position" Class="flex-grow-1" />
+                    </MudList>
+                </MudPaper>
+            }
+        </ChildContent>
+        <ItemRenderer>
+            <MudListItem T="string">
+                <div>
+                    <strong>@context.Kunde.Firmenname</strong><br />
+                    <em>Services:</em> @string.Join(", ", context.Services.Select(n => n.ServiceName))<br />
+                    <em>Wert:</em> @context.AuftragsValue.ToString("C")
+                </div>
+            </MudListItem>
+        </ItemRenderer>
+    </MudDropContainer>
+</div>
+
+@code {
+
+
+
+    private List<Status> statusListe = new();
+    private List<Backend.Models.Auftrag> auftragListe = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        statusListe = await context.Status.ToListAsync();
+        statusListe.OrderBy(obj => int.TryParse(obj.Position, out var zahl) ? zahl : 0).ToList();
+        auftragListe = await context.Auftraege.Include(a => a.Services).Include(a => a.Kunde).Include(a => a.Status).ToListAsync();
+
+    }
+
+    private async Task OnItemDropped(MudItemDropInfo<Backend.Models.Auftrag> dropInfo)
+    {
+        // using var context = await DbFactory.CreateDbContextAsync();
+
+        // var auftrag = await context.Auftraege.FindAsync(dropInfo.Item.Id);
+        // if(auftrag != null)
+        // {
+        //     auftrag.Status.Position = dropInfo.DropzoneIdentifier;
+        //     await context.SaveChangesAsync();
+        // }
+
+        dropInfo.Item.Status.Position = dropInfo.DropzoneIdentifier;
+        StateHasChanged();
+    }
+
+}
