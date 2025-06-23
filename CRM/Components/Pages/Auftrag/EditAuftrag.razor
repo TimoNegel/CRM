@@ -4,26 +4,21 @@
 <br />
 
 <MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateAuftrag" Model="auftrag">
-    <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true" Placeholder="-">
+    <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true">
         @foreach(var k in kundenListe)
         {
             <MudSelectItem Value="@k">@k.Firmenname</MudSelectItem>
         }
     </MudSelect>
 
-    <MudSelect T="Service"
-               Label="Services"
-               Required="true"
-               MultiSelection="true"
-               @bind-SelectedValues="selectedServices"
-               Placeholder="-">
+    <MudSelect T="Service" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetSelectedServiceNames))" Label="Services" Required="true" MultiSelection="true" @bind-SelectedValues="selectedServices">
         @foreach(var s in serviceListe)
         {
             <MudSelectItem Value="@s">@s.ServiceName</MudSelectItem>
         }
     </MudSelect>
 
-    <MudSelect @bind-Value="auftrag.Status" Label="Status" Required="true" Placeholder="-">
+    <MudSelect @bind-Value="auftrag.Status" Label="Status" Required="true">
         @foreach(var s in statusListe)
         {
             <MudSelectItem Value="@s">@s.Name</MudSelectItem>
@@ -95,7 +90,12 @@
         existingAuftrag.AuftragsValue = existingAuftrag.Services.Sum(s => s.Preis);
 
         await context.SaveChangesAsync();
-        
+
         Navigation.NavigateTo($"/auftraege/view");
+    }
+
+    private string GetSelectedServiceNames(List<string> selectedValues)
+    {
+        return string.Join(", ", selectedServices.Select(s => s.ServiceName));
     }
 }

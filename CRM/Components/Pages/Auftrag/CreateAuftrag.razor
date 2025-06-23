@@ -5,14 +5,14 @@
 
 <MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddAuftrag" Model="auftrag">
 
-    <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true" Placeholder="-">
+    <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true">
         @foreach(var k in kundenListe)
         {
             <MudSelectItem Value="@k">@k.Firmenname</MudSelectItem>
         }
     </MudSelect>
 
-    <MudSelect T="Service" Label="Services" Required="true" MultiSelection="true" @bind-SelectedValues="selectedServices">
+    <MudSelect MultiSelectionTextFunc="@(new Func<List<string>, string>(GetSelectedServiceNames))" T="Service" Label="Services" Required="true" MultiSelection="true" @bind-SelectedValues="selectedServices">
        
         @foreach(var s in serviceListe)
         {
@@ -20,7 +20,7 @@
         }
     </MudSelect>
 
-    <MudSelect @bind-Value="auftrag.Status" Label="Status" Required="true" Placeholder="-">
+    <MudSelect @bind-Value="auftrag.Status" Label="Status" Required="true">
         @foreach(var s in statusListe)
         {
             <MudSelectItem Value="@s">@s.Name</MudSelectItem>
@@ -34,7 +34,7 @@
 </MudForm>
 
 @code {
-    private Auftrag auftrag = new Auftrag();
+    private Auftrag auftrag = new Auftrag(){Kunde = null, Status = null};
     private List<Kunde> kundenListe = new List<Kunde>();
     private List<Status> statusListe = new List<Status>();
     private List<Service> serviceListe = new List<Service>();
@@ -74,5 +74,11 @@
         await context.SaveChangesAsync();
 
         Navigation.NavigateTo($"/auftraege/view");
+    }
+
+
+    private string GetSelectedServiceNames(List<string> selectedValues)
+    {
+        return string.Join(", ", selectedServices.Select(s => s.ServiceName));
     }
 }
