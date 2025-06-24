@@ -41,13 +41,6 @@ namespace CRM.Data
                 .HasForeignKey(a => a.KundenId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // Auftrag - Status (One-to-Many)
-            modelBuilder.Entity<Auftrag>()
-                .HasOne(a => a.Status)
-                .WithMany(s => s.Auftraege)
-                .HasForeignKey(a => a.StatusId)
-                .OnDelete(DeleteBehavior.NoAction);
-
             // Many-to-Many zwischen Auftrag und Service
             modelBuilder.Entity<Auftrag>()
                 .HasMany(a => a.Services)

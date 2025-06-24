@@ -6,8 +6,8 @@
     <Columns>
         <PropertyColumn Property="x => x.Kunde.Firmenname" Label="Kundenname" />
         <PropertyColumn Property="x => x.AuftragsValue" Label="Auftragswert" />
-        <PropertyColumn Property="x => x.Status.Name" Label="Status" />
-        <TemplateColumn CellClass="d-flex justify-center">
+@*         <PropertyColumn Property="x => x.Status.Name" Label="Status" />
+ *@        <TemplateColumn CellClass="d-flex justify-center">
             <CellTemplate Context="context">
                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditAuftragPage(context.Item.Id)" />
                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteAuftrag(context.Item.Id)" />
@@ -22,7 +22,7 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = await DbFactory.CreateDbContextAsync();
-        auftragsListe = await context.Auftraege.Include(a => a.Kunde).Include(a => a.Status).ToListAsync();
+        auftragsListe = await context.Auftraege.Include(a => a.Kunde).ToListAsync();
     }
 
     private async Task DeleteAuftrag(Guid auftragId)

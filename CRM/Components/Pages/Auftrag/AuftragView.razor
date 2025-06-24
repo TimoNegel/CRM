@@ -7,7 +7,7 @@
     <MudCardContent>
         <MudText><b>Auftragswert:</b> @auftrag.AuftragsValue €</MudText>
         <MudText><b>Kunde:</b> @auftrag.Kunde.Firmenname</MudText>
-        <MudText><b>Status:</b> @auftrag.Status.Name</MudText>
+        <MudText><b>Status:</b> @statusText</MudText>
         <MudText><b>Services:</b></MudText>
         @foreach(var service in auftrag.Services)
         {
@@ -26,11 +26,14 @@
 @code {
     [Parameter] public Guid Id { get; set; }
     private Auftrag auftrag = new Auftrag();
+    private string statusText = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        auftrag = await context.Auftraege.Include(a => a.Kunde).Include(a => a.Status).Include(a => a.Services).FirstOrDefaultAsync(a => a.Id == Id);
+        auftrag = await context.Auftraege.Include(a => a.Kunde).Include(a => a.Services).FirstOrDefaultAsync(a => a.Id == Id);
+        await context.Status.FirstOrDefaultAsync(s => s.Position == int.Parse(auftrag.Position)).ContinueWith(t => statusText = t.Result?.Name ?? "Unbekannt");
+        
     }
 
     private void NavigateToEditAuftragPage()

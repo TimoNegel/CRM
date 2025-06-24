@@ -20,10 +20,10 @@
         }
     </MudSelect>
 
-    <MudSelect @bind-Value="auftrag.Status" Label="Status" Required="true">
+    <MudSelect @bind-Value="auftrag.Position" Label="Status" Required="true">
         @foreach(var s in statusListe)
         {
-            <MudSelectItem Value="@s">@s.Name</MudSelectItem>
+            <MudSelectItem Value="@s.Position.ToString()">@s.Name</MudSelectItem>
         }
     </MudSelect>
 
@@ -34,7 +34,7 @@
 </MudForm>
 
 @code {
-    private Auftrag auftrag = new Auftrag(){Kunde = null, Status = null};
+    private Auftrag auftrag = new Auftrag(){Kunde = null};
     private List<Kunde> kundenListe = new List<Kunde>();
     private List<Status> statusListe = new List<Status>();
     private List<Service> serviceListe = new List<Service>();
@@ -62,10 +62,6 @@
         // Kunde aus dem Kontext laden
         auftrag.Kunde = await context.Kunden
             .FirstOrDefaultAsync(k => k.Id == auftrag.Kunde.Id);
-
-        // Status aus dem Kontext laden
-        auftrag.Status = await context.Status
-            .FirstOrDefaultAsync(s => s.Id == auftrag.Status.Id);
 
         // Auftragswert berechnen
         auftrag.AuftragsValue = auftrag.Services.Sum(s => s.Preis);
