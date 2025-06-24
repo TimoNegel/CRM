@@ -1,7 +1,26 @@
 ﻿@page "/"
 @using CRM.Components.Pages.Auftrag
+@using CRM.Components.Pages.Status
 
-<MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Inherit" Edge="Edge.End" OnClick="OpenCreateAuftrag" Size="Size.Large" />
+@if(statusListe.Any()){ 
+
+<div class="d-flex justify-end align-center mb-5">
+    <MudIconButton Class="mr-5"
+        Icon="@Icons.Material.Filled.Add"
+                   Color="Color.Primary"
+                   Edge="Edge.End"
+                   OnClick="OpenCreateAuftrag"
+                   Size="Size.Large"
+                   Variant="Variant.Filled" />
+    
+    <MudButton Class="ml-2"
+                   Color="Color.Primary"
+               OnClick="OpenEditStatus"
+               Variant="Variant.Filled">
+        Pipeline bearbeiten
+    </MudButton>
+</div>
+
 
 <div style="overflow-x: auto; white-space: nowrap;">
     <MudDropContainer T="Backend.Models.Auftrag"
@@ -31,10 +50,15 @@
             </MudListItem>
         </ItemRenderer>
     </MudDropContainer>
-</div>
+    </div>
+}
+else
+{
+    <CRM.Components.Pages.Status.CreateStatus/>
+}
 
 @code {
-    private List<Status> statusListe = new();
+    private List<Backend.Models.Status> statusListe = new();
     private List<Backend.Models.Auftrag> auftragListe = new();
 
     protected override async Task OnInitializedAsync()
@@ -89,5 +113,17 @@
         };
 
         DialogService.Show<AuftragView>("", parameters, options);
+     }
+
+         private void OpenEditStatus()
+    {
+        var options = new DialogOptions()
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        };
+        DialogService.Show<EditStatus>("", options);
+        StateHasChanged();
      }
 }

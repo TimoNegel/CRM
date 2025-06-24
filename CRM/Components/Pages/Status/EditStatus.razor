@@ -1,0 +1,79 @@
+﻿@page "/status/edit"
+
+<MudPaper Class="pa-4" Elevation="4">
+    <MudText Typo="Typo.h5">CRM-Pipeline bearbeiten</MudText>
+
+    @foreach(var status in statusList)
+    {
+        <MudGrid Class="my-2">
+            <MudItem xs="10">
+                <MudTextField @bind-Value="status.Name" Label="Statusname" Immediate="true" />
+            </MudItem>
+            <MudItem xs="2" Class="d-flex align-center">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveStatus(status))" />
+            </MudItem>
+        </MudGrid>
+    }
+
+    <MudButton OnClick="AddStatus" Color="Color.Primary" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add">
+        Neuer Eintrag
+    </MudButton>
+
+    <MudDivider Class="my-4" />
+
+    <MudButton OnClick="Submit" Color="Color.Success" Variant="Variant.Filled">
+        Bearbeiten
+    </MudButton>
+</MudPaper>
+
+@code {
+    private List<Status> statusList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        statusList = await context.Status.ToListAsync();
+        statusList = statusList.OrderBy(s => s.Position).ToList();
+    }
+
+    private void AddStatus()
+    {
+        statusList.Add(new Status
+        {
+            Id = Guid.NewGuid(),
+            Name = string.Empty,
+            Position = statusList.Count + 1
+        });
+
+    }
+
+    private async Task RemoveStatus(Status status)
+    {
+        statusList.Remove(status);
+        for(int i = 0; i < statusList.Count; i++)
+        {
+            statusList[i].Position = i + 1;
+        }
+
+        using var context = await DbFactory.CreateDbContextAsync();
+        context.Status.Update(status);
+        await context.SaveChangesAsync();
+    }
+
+    private async Task Submit()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        foreach(var status in statusList)
+        {
+            if (!context.Status.Contains(status))
+            {
+                await context.Status.AddAsync(status);
+            }
+        }
+        await context.SaveChangesAsync();
+
+        context.Status.UpdateRange(statusList);
+        await context.SaveChangesAsync();
+        Navigation.NavigateTo(Navigation.Uri, true);
+    }
+}
