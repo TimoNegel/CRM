@@ -2,72 +2,99 @@
 @using CRM.Components.Pages.Auftrag
 @using CRM.Components.Pages.Status
 
-@if(statusListe.Any()){ 
+@if(statusListe.Any())
+{
 
-<div class="d-flex justify-end align-center mb-5">
-    <MudIconButton Class="mr-5"
-        Icon="@Icons.Material.Filled.Add"
+    <div class="d-flex justify-end align-center mb-5">
+        <MudIconButton Class="mr-5"
+                       Icon="@Icons.Material.Filled.Add"
+                       Color="Color.Primary"
+                       Edge="Edge.End"
+                       OnClick="OpenCreateAuftrag"
+                       Size="Size.Large"
+                       Variant="Variant.Filled" />
+
+        <MudButton Class="ml-2"
                    Color="Color.Primary"
-                   Edge="Edge.End"
-                   OnClick="OpenCreateAuftrag"
-                   Size="Size.Large"
-                   Variant="Variant.Filled" />
-    
-    <MudButton Class="ml-2"
-                   Color="Color.Primary"
-               OnClick="OpenEditStatus"
-               Variant="Variant.Filled">
-        Pipeline bearbeiten
-    </MudButton>
-</div>
+                   OnClick="OpenEditStatus"
+                   Variant="Variant.Filled">
+            Pipeline bearbeiten
+        </MudButton>
+    </div>
 
-
-<div style="overflow-x: auto; white-space: nowrap;">
-    <MudDropContainer T="Backend.Models.Auftrag"
-                      Items="auftragListe"
-                      ItemsSelector="@((item, dropzone) => item.Position == dropzone)"
-                      ItemDropped="OnItemDropped"
-                      Class="d-inline-flex flex-nowrap px-2"
-                      Style="min-height: 400px;">
-        <ChildContent>
-            @foreach(var stage in statusListe)
-            {
-                <MudPaper Class="ma-2 pa-2 d-inline-block" Style="min-width: 280px; max-width: 320px;">
-                    <MudList T="string" Class="d-flex flex-column mud-height-full">
-                        <MudListSubheader>@stage.Name</MudListSubheader>
-                        <MudDropZone T="Backend.Models.Auftrag" Identifier="@stage.Position.ToString()" Class="flex-grow-1" />
-                    </MudList>
-                </MudPaper>
-            }
-        </ChildContent>
-        <ItemRenderer>
-            <MudListItem T="string">
-                <div onclick="@(() => OpenViewAuftrag(context))">
-                    <strong>@context.Kunde.Firmenname</strong><br />
-                    <em>Services:</em> @string.Join(", ", context.Services.Select(n => n.ServiceName))<br />
-                    <em>Wert:</em> @context.AuftragsValue.ToString("C")
-                </div>
-            </MudListItem>
-        </ItemRenderer>
-    </MudDropContainer>
+    <div style="overflow-x: auto; white-space: nowrap;">
+        <MudDropContainer T="Backend.Models.Auftrag"
+                          Items="auftragListe"
+                          ItemsSelector="@((item, dropzone) => item.Position == dropzone)"
+                          ItemDropped="OnItemDropped"
+                          Class="d-inline-flex flex-nowrap px-2"
+                          Style="min-height: 400px;">
+            <ChildContent>
+                @foreach(var stage in statusListe)
+                {
+                    <MudPaper Class="ma-2 pa-2 d-inline-block" Style="min-width: 280px; max-width: 320px;">
+                        <MudList T="string" Class="d-flex flex-column mud-height-full">
+                            <MudListSubheader>@stage.Name</MudListSubheader>
+                            <MudDropZone T="Backend.Models.Auftrag" Identifier="@stage.Position.ToString()" Class="flex-grow-1" />
+                        </MudList>
+                    </MudPaper>
+                }
+            </ChildContent>
+            <ItemRenderer>
+                <MudListItem T="string">
+                    <div onclick="@(() => OpenViewAuftrag(context))">
+                        <strong>@context.Kunde.Firmenname</strong><br />
+                        <em>Services:</em> @string.Join(", ", context.Services.Select(n => n.ServiceName))<br />
+                        <em>Wert:</em> @context.AuftragsValue.ToString("C")
+                    </div>
+                </MudListItem>
+            </ItemRenderer>
+        </MudDropContainer>
     </div>
 }
 else
 {
-    <CRM.Components.Pages.Status.CreateStatus/>
+    <CRM.Components.Pages.Status.CreateStatus />
 }
 
 @code {
     private List<Backend.Models.Status> statusListe = new();
     private List<Backend.Models.Auftrag> auftragListe = new();
+    private Guid currentTeamId;
 
     protected override async Task OnInitializedAsync()
     {
         using var context = await DbFactory.CreateDbContextAsync();
-        statusListe = await context.Status.ToListAsync();
-        statusListe = statusListe.OrderBy(s => s.Position).ToList();
-        auftragListe = await context.Auftraege.Include(a => a.Services).Include(a => a.Kunde).ToListAsync();
+        var user = await FillUserInformation();
+        if(user is not null)
+        {
+            currentTeamId = user.Team.Id;
 
+            statusListe = await context.Status
+                .Where(s => s.TeamId == currentTeamId)
+                .OrderBy(s => s.Position)
+                .ToListAsync();
+
+            auftragListe = await context.Auftraege
+                .Include(a => a.Services)
+                .Include(a => a.Kunde)
+                .Where(s => s.TeamId == currentTeamId)
+                .Where(a => statusListe.Select(s => s.Position.ToString()).Contains(a.Position))
+                .ToListAsync();
+        }
+    }
+
+    private async Task<CrmUser?> FillUserInformation()
+    {
+        await CurrentUserService.LoadCurrentUserAsync();
+        var normalizedUserName = CurrentUserService.CurrentUser?.NormalizedUserName?.ToUpper();
+        if(string.IsNullOrEmpty(normalizedUserName))
+            return null;
+
+        using var context = DbFactory.CreateDbContext();
+        return await context.Users
+            .Include(u => u.Team)
+            .FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUserName);
     }
 
     private async Task OnItemDropped(MudItemDropInfo<Backend.Models.Auftrag> dropInfo)
@@ -79,8 +106,6 @@ else
 
         auftrag.Position = dropInfo.DropzoneIdentifier;
         await context.SaveChangesAsync();
-
-
     }
 
     private async Task OpenCreateAuftrag()
@@ -113,9 +138,9 @@ else
         };
 
         DialogService.Show<AuftragView>("", parameters, options);
-     }
+    }
 
-         private void OpenEditStatus()
+    private void OpenEditStatus()
     {
         var options = new DialogOptions()
         {
@@ -125,5 +150,5 @@ else
         };
         DialogService.Show<EditStatus>("", options);
         StateHasChanged();
-     }
+    }
 }

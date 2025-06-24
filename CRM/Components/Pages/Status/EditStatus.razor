@@ -28,12 +28,17 @@
 
 @code {
     private List<Status> statusList = new();
+    private Guid currentTeamId;
 
     protected override async Task OnInitializedAsync()
     {
         using var context = await DbFactory.CreateDbContextAsync();
-        statusList = await context.Status.ToListAsync();
-        statusList = statusList.OrderBy(s => s.Position).ToList();
+        var user = await FillUserInformation();
+        currentTeamId = user.Team.Id;
+        statusList = await context.Status
+            .Where(s => s.TeamId == currentTeamId)
+            .OrderBy(s => s.Position)
+            .ToListAsync();
     }
 
     private void AddStatus()
@@ -42,9 +47,9 @@
         {
             Id = Guid.NewGuid(),
             Name = string.Empty,
-            Position = statusList.Count + 1
+            Position = statusList.Count + 1,
+            TeamId = currentTeamId
         });
-
     }
 
     private async Task RemoveStatus(Status status)
@@ -56,7 +61,7 @@
         }
 
         using var context = await DbFactory.CreateDbContextAsync();
-        context.Status.Update(status);
+        context.Status.Remove(status);
         await context.SaveChangesAsync();
     }
 
@@ -65,15 +70,30 @@
         using var context = await DbFactory.CreateDbContextAsync();
         foreach(var status in statusList)
         {
-            if (!context.Status.Contains(status))
+            status.TeamId = currentTeamId;
+            if(!await context.Status.AnyAsync(s => s.Id == status.Id))
             {
                 await context.Status.AddAsync(status);
             }
+            else
+            {
+                context.Status.Update(status);
+            }
         }
         await context.SaveChangesAsync();
-
-        context.Status.UpdateRange(statusList);
-        await context.SaveChangesAsync();
         Navigation.NavigateTo(Navigation.Uri, true);
+    }
+
+    private async Task<CrmUser?> FillUserInformation()
+    {
+        await CurrentUserService.LoadCurrentUserAsync();
+        var normalizedUserName = CurrentUserService.CurrentUser?.NormalizedUserName?.ToUpper();
+        if(string.IsNullOrEmpty(normalizedUserName))
+            return null;
+
+        using var context = DbFactory.CreateDbContext();
+        return await context.Users
+            .Include(u => u.Team)
+            .FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUserName);
     }
 }

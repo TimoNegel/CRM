@@ -8,7 +8,7 @@
         <br />
 
         <MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddAuftrag" Model="auftrag">
-
+                
 
             <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true">
                 @foreach(var k in kundenListe)
@@ -52,12 +52,18 @@
     private List<Status> statusListe = new List<Status>();
     private List<Service> serviceListe = new List<Service>();
     private IEnumerable<Service> selectedServices = new HashSet<Service>();
+    private Guid currentTeamId;
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
+        var user = await FillUserInformation();
+        currentTeamId = user.Team.Id;
+
         kundenListe = await context.Kunden.ToListAsync();
-        statusListe = await context.Status.ToListAsync();
+        statusListe = await context.Status
+            .Where(s => s.TeamId == currentTeamId)
+            .ToListAsync();
         serviceListe = await context.Services.ToListAsync();
     }
 
@@ -69,12 +75,17 @@
 
         // Services aus dem Kontext laden
         auftrag.Services = await context.Services
-            .Where(s => selectedServices.Select(s => s.Id).ToList().Contains(s.Id))
+            .Where(s => selectedServices.Select(sel => sel.Id).Contains(s.Id))
             .ToListAsync();
 
         // Kunde aus dem Kontext laden
-        auftrag.Kunde = await context.Kunden
+        var kunde = await context.Kunden
             .FirstOrDefaultAsync(k => k.Id == auftrag.Kunde.Id);
+        auftrag.Kunde = kunde;
+        auftrag.KundenId = kunde.Id;
+
+        // TeamId setzen
+        auftrag.TeamId = currentTeamId;
 
         // Auftragswert berechnen
         auftrag.AuftragsValue = auftrag.Services.Sum(s => s.Preis);
@@ -85,6 +96,18 @@
         MudDialog.Cancel();
     }
 
+    private async Task<CrmUser?> FillUserInformation()
+    {
+        await CurrentUserService.LoadCurrentUserAsync();
+        var normalizedUserName = CurrentUserService.CurrentUser?.NormalizedUserName?.ToUpper();
+        if(string.IsNullOrEmpty(normalizedUserName))
+            return null;
+
+        using var context = DbFactory.CreateDbContext();
+        return await context.Users
+            .Include(u => u.Team)
+            .FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUserName);
+    }
 
     private string GetSelectedServiceNames(List<string> selectedValues)
     {
@@ -100,7 +123,7 @@
             FullWidth = true,
         };
 
-        var dialog = DialogService.Show<CreateKunde>("", options);
+        var dialog = DialogService.Show<CreateKundeDialog>("", options);
         var result = await dialog.Result;
         using var context = await DbFactory.CreateDbContextAsync();
         kundenListe = await context.Kunden.ToListAsync();
@@ -116,7 +139,7 @@
             FullWidth = true,
         };
 
-        var dialog = DialogService.Show<CreateService>("", options);
+        var dialog = DialogService.Show<CreateServiceDialog>("", options);
         var result = await dialog.Result;
         using var context = await DbFactory.CreateDbContextAsync();
         serviceListe = await context.Services.ToListAsync();

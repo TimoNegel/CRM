@@ -9,6 +9,9 @@
 
         public string Name { get; set; } = string.Empty;
 
+        public Guid TeamId { get; set; }
+        public virtual Team Team { get; set; }
+
         // Navigation Properties
         public virtual ICollection<Auftrag> Auftraege { get; set; } = new List<Auftrag>();
     }

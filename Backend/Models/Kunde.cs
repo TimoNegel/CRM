@@ -17,8 +17,6 @@
 
         // Navigation Properties
         public virtual ICollection<Auftrag> Auftraege { get; set; } = new List<Auftrag>();
-        public virtual ICollection<KontaktHistorie> KontaktHistorien { get; set; } = new List<KontaktHistorie>();
-        public virtual ICollection<Angebot> Angebote { get; set; } = new List<Angebot>();
         public virtual ICollection<Rechnung> Rechnungen { get; set; } = new List<Rechnung>();
     }
 }

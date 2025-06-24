@@ -1,7 +1,7 @@
 ﻿@page "/auftrag/edit/{Id:guid}"
 
 <MudText Typo="Typo.h4">Auftrag bearbeiten</MudText>
-<br />
+<br />              
 
 <MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateAuftrag" Model="auftrag">
     <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true">
@@ -38,17 +38,34 @@
     private List<Status> statusListe = new List<Status>();
     private List<Service> serviceListe = new List<Service>();
     private IEnumerable<Service> selectedServices = new HashSet<Service>();
-
+    private Guid currentTeamId;
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
+        var user = await FillUserInformation();
+        currentTeamId = user.Team.Id;
+
         auftrag = await context.Auftraege.FirstOrDefaultAsync(a => a.Id == Id) ?? new Auftrag();
         kundenListe = await context.Kunden.ToListAsync();
-        statusListe = await context.Status.ToListAsync();
+        statusListe = await context.Status
+            .Where(s => s.TeamId == currentTeamId)
+            .ToListAsync();
         serviceListe = await context.Services.ToListAsync();
         selectedServices = auftrag.Services ?? new HashSet<Service>();
+    }
 
+    private async Task<CrmUser?> FillUserInformation()
+    {
+        await CurrentUserService.LoadCurrentUserAsync();
+        var normalizedUserName = CurrentUserService.CurrentUser?.NormalizedUserName?.ToUpper();
+        if(string.IsNullOrEmpty(normalizedUserName))
+            return null;
+
+        using var context = DbFactory.CreateDbContext();
+        return await context.Users
+            .Include(u => u.Team)
+            .FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUserName);
     }
 
     private async Task UpdateAuftrag()

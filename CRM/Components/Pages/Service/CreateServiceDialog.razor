@@ -1,5 +1,5 @@
-﻿@page "/service/create"
-
+﻿<MudDialog Class="pb-6 px-6">
+    <DialogContent>
         <MudText Typo="Typo.h4">Service hinzufügen</MudText>
         <br />
 
@@ -13,8 +13,13 @@
                 Service hinzufügen
             </MudButton>
         </MudForm>
+    </DialogContent>
+</MudDialog>
 
 @code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
     private Service service = new Service();
 
     private async Task AddService()
@@ -24,6 +29,7 @@
         using var context = DbFactory.CreateDbContext();
         context.Services.Add(service);
         await context.SaveChangesAsync();
-        Navigation.NavigateTo("/services/view");
+
+        MudDialog.Cancel();
     }
 }

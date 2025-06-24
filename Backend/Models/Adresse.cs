@@ -13,7 +13,6 @@
         public string Land { get; set; } = string.Empty;
 
         // Navigation Properties für Beziehungen
-        public virtual ICollection<Mitarbeiter> Mitarbeiter { get; set; } = new List<Mitarbeiter>();
         public virtual ICollection<Kunde> Kunden { get; set; } = new List<Kunde>();
 
         public string FormatierteAdresse => $"{Strasse} {Hausnummer}, {PLZ} {Ort}, {Land}";

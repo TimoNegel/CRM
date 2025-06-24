@@ -26,12 +26,12 @@
 
 @code {
     [Parameter] public Guid Id { get; set; }
-    private Mitarbeiter mitarbeiter = new Mitarbeiter { Adresse = new Adresse() };
+    private CrmUser mitarbeiter = new CrmUser { Adresse = new Adresse() };
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        mitarbeiter = await context.Mitarbeiter.Include(m => m.Adresse).FirstOrDefaultAsync(m => m.Id == Id) ?? new Mitarbeiter();
+        mitarbeiter = await context.Users.Include(m => m.Adresse).FirstOrDefaultAsync(m => m.IdGuid == Id) ?? new CrmUser();
     }
 
     private void NavigateToEditMitarbeiterPage()
@@ -42,10 +42,10 @@
     private async Task DeleteMitarbeiter()
     {
         using var context = DbFactory.CreateDbContext();
-        var mitarbeiterToDelete = context.Mitarbeiter.FirstOrDefault(m => m.Id == Id);
+        var mitarbeiterToDelete = context.Users.FirstOrDefault(m => m.IdGuid == Id);
         if (mitarbeiterToDelete != null)
         {
-            context.Mitarbeiter.Remove(mitarbeiterToDelete);
+            context.Users.Remove(mitarbeiterToDelete);
             await context.SaveChangesAsync();
             Navigation.NavigateTo("/mitarbeiter/view");
         }

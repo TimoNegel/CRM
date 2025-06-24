@@ -1,3 +1,4 @@
+using Backend.Services;
 using CRM.Components;
 using CRM.Components.Account;
 using CRM.Data;
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
+
+builder.Services.AddScoped<CurrentUserService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

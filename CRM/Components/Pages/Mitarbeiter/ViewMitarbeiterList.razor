@@ -2,40 +2,41 @@
 
 <MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateMitarbeiterPage()">Mitarbeiter hinzufügen</MudButton>
 
-<MudDataGrid T="Mitarbeiter" Items="@mitarbeiterListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default" RowClick="@((context) => NavigateToViewMitarbeiterPage(context.Item.Id))">
+<MudDataGrid T="CrmUser" Items="@mitarbeiterListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default" RowClick="@((context) => NavigateToViewMitarbeiterPage(context.Item.IdGuid))">
     <Columns>
         <PropertyColumn Property="x => x.Vorname" />
         <PropertyColumn Property="x => x.Nachname" />
+        <PropertyColumn Property="x => x.Team.Name" Title="Team Name"/>
         <PropertyColumn Property="x => x.Email" />
         <PropertyColumn Property="x => x.Telefonnummer" />
         <PropertyColumn Property="x => x.Adresse.FormatierteAdresse" />
         <TemplateColumn CellClass="d-flex justify-center">
             <CellTemplate Context="context">
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditMitarbeiterPage(context.Item.Id)" />
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteMitarbeiter(context.Item.Id)" />
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditMitarbeiterPage(context.Item.IdGuid)" />
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteMitarbeiter(context.Item.IdGuid)" />
             </CellTemplate>
         </TemplateColumn>
     </Columns>
 </MudDataGrid>
 
 @code {
-    private List<Mitarbeiter> mitarbeiterListe = new();
+    private List<CrmUser> mitarbeiterListe = new();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = await DbFactory.CreateDbContextAsync();
-        mitarbeiterListe = await context.Mitarbeiter.Include(m => m.Adresse).ToListAsync();
+        mitarbeiterListe = await context.Users.Include(m => m.Adresse).Include(m => m.Team).ToListAsync();
     }
 
     private async Task DeleteMitarbeiter(Guid mitarbeiterId)
     {
         using var context = DbFactory.CreateDbContext();
-        var mitarbeiter = context.Mitarbeiter.FirstOrDefault(m => m.Id == mitarbeiterId);
+        var mitarbeiter = context.Users.FirstOrDefault(m => m.IdGuid == mitarbeiterId);
         if (mitarbeiter != null)
         {
-            context.Mitarbeiter.Remove(mitarbeiter);
+            context.Users.Remove(mitarbeiter);
             await context.SaveChangesAsync();
-            mitarbeiterListe = context.Mitarbeiter.ToList();
+            mitarbeiterListe = context.Users.ToList();
             StateHasChanged();
         }
     }

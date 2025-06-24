@@ -14,6 +14,15 @@
     <MudTextField @bind-Value="mitarbeiter.Adresse.PLZ" Label="PLZ" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Adresse.Land" Label="Land" Required="true" />
 
+    <MudSelect @bind-Value="selectedTeam" Label="Team" Required="true">
+        @foreach(var k in teamListe)
+        {
+            <MudSelectItem Value="@k">@k.Name</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudTextField @bind-Value="neuerTeamName" Label="Neues Team" />
+    <MudButton OnClick="AddNewTeam">Neues Team anlegen</MudButton>
     <br />
     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
         Änderungen speichern
@@ -22,20 +31,47 @@
 
 @code {
     [Parameter] public Guid Id { get; set; }
-    private Mitarbeiter mitarbeiter = new Mitarbeiter { Adresse = new Adresse() };
+    private CrmUser mitarbeiter = new CrmUser { Adresse = new Adresse() };
+
+    private List<Team> teamListe = new List<Team>();
+    private Team selectedTeam;
+    private string neuerTeamName = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        mitarbeiter = await context.Mitarbeiter.Include(m => m.Adresse).FirstOrDefaultAsync(m => m.Id == Id) ?? new Mitarbeiter();
+        mitarbeiter = await context.Users
+            .Include(m => m.Adresse)
+            .Include(m => m.Team)
+            .FirstOrDefaultAsync(m => m.IdGuid == Id) ?? new CrmUser { Adresse = new Adresse() };
+
+        teamListe = await context.Teams.ToListAsync();
+
+        selectedTeam = mitarbeiter.Team;
+
     }
 
     private async Task UpdateMitarbeiter()
     {
         using var context = DbFactory.CreateDbContext();
-        context.Mitarbeiter.Update(mitarbeiter);
+        mitarbeiter.Team = context.Teams.FirstOrDefault(x => x.Id == selectedTeam.Id);
+        context.Users.Update(mitarbeiter);
         await context.SaveChangesAsync();
 
         Navigation.NavigateTo($"/mitarbeiter/view");
+    }
+
+    private async Task AddNewTeam()
+    {
+        if(string.IsNullOrWhiteSpace(neuerTeamName))
+            return;
+
+        var newTeam = new Team { Id = Guid.NewGuid(), Name = neuerTeamName, Pipeline = new Pipeline() };
+        using var context = DbFactory.CreateDbContext();
+        context.Teams.Add(newTeam);
+        await context.SaveChangesAsync();
+        teamListe.Add(newTeam);
+        selectedTeam = newTeam;
+        neuerTeamName = string.Empty;
     }
 }
