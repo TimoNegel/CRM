@@ -1,20 +1,27 @@
 ﻿@page "/service/create"
 
-<MudText Typo="Typo.h4">Service hinzufügen</MudText>
-<br />
+<MudDialog Class="pb-6 px-6">
+    <DialogContent>
+        <MudText Typo="Typo.h4">Service hinzufügen</MudText>
+        <br />
 
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddService" Model="service">
-    <MudTextField @bind-Value="service.ServiceName" Label="Service Name" Required="true" />
-    <MudTextField @bind-Value="service.AufwandsZeit" Label="Aufwandszeit (hh:mm:ss)" Required="true" />
-    <MudTextField @bind-Value="service.Preis" Label="Preis" Required="true" />
+        <MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddService" Model="service">
+            <MudTextField @bind-Value="service.ServiceName" Label="Service Name" Required="true" />
+            <MudTextField @bind-Value="service.AufwandsZeit" Label="Aufwandszeit (hh:mm:ss)" Required="true" />
+            <MudTextField @bind-Value="service.Preis" Label="Preis" Required="true" />
 
-    <br />
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
-        Service hinzufügen
-    </MudButton>
-</MudForm>
+            <br />
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+                Service hinzufügen
+            </MudButton>
+        </MudForm>
+    </DialogContent>
+</MudDialog>
 
 @code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
     private Service service = new Service();
 
     private async Task AddService()
@@ -25,6 +32,6 @@
         context.Services.Add(service);
         await context.SaveChangesAsync();
 
-        Navigation.NavigateTo($"/services/view");
+        MudDialog.Cancel();
     }
 }

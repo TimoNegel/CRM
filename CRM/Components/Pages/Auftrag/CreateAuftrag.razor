@@ -1,40 +1,54 @@
 ﻿@page "/auftrag/create"
+@using CRM.Components.Pages.Kunde
+@using CRM.Components.Pages.Service
 
-<MudText Typo="Typo.h4">Auftrag hinzufügen</MudText>
-<br />
 
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddAuftrag" Model="auftrag">
+<MudDialog Class="pb-6 px-6">
+    <DialogContent>
+        <MudText Typo="Typo.h4">Auftrag hinzufügen</MudText>
+        <br />
 
-    <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true">
-        @foreach(var k in kundenListe)
-        {
-            <MudSelectItem Value="@k">@k.Firmenname</MudSelectItem>
-        }
-    </MudSelect>
+        <MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddAuftrag" Model="auftrag">
 
-    <MudSelect MultiSelectionTextFunc="@(new Func<List<string>, string>(GetSelectedServiceNames))" T="Service" Label="Services" Required="true" MultiSelection="true" @bind-SelectedValues="selectedServices">
-       
-        @foreach(var s in serviceListe)
-        {
-            <MudSelectItem Value="@s">@s.ServiceName</MudSelectItem>
-        }
-    </MudSelect>
 
-    <MudSelect @bind-Value="auftrag.Position" Label="Status" Required="true">
-        @foreach(var s in statusListe)
-        {
-            <MudSelectItem Value="@s.Position.ToString()">@s.Name</MudSelectItem>
-        }
-    </MudSelect>
+            <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true">
+                @foreach(var k in kundenListe)
+                {
+                    <MudSelectItem Value="@k">@k.Firmenname</MudSelectItem>
+                }
+            </MudSelect>
 
-    <br />
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
-        Auftrag hinzufügen
-    </MudButton>
-</MudForm>
+            <MudButton OnClick="OpenCreateKunde">Neuer Kunde</MudButton>
+
+            <MudSelect MultiSelectionTextFunc="@(new Func<List<string>, string>(GetSelectedServiceNames))" T="Service" Label="Services" Required="true" MultiSelection="true" @bind-SelectedValues="selectedServices">
+                @foreach(var s in serviceListe)
+                {
+                    <MudSelectItem Value="@s">@s.ServiceName</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudButton OnClick="OpenCreateService">Neuer Service</MudButton>
+
+            <MudSelect @bind-Value="auftrag.Position" Label="Status" Required="true">
+                @foreach(var s in statusListe)
+                {
+                    <MudSelectItem Value="@s.Position.ToString()">@s.Name</MudSelectItem>
+                }
+            </MudSelect>
+
+            <br />
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+                Auftrag hinzufügen
+            </MudButton>
+        </MudForm>
+    </DialogContent>
+</MudDialog>
 
 @code {
-    private Auftrag auftrag = new Auftrag(){Kunde = null};
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private Auftrag auftrag = new Auftrag() { Kunde = null };
     private List<Kunde> kundenListe = new List<Kunde>();
     private List<Status> statusListe = new List<Status>();
     private List<Service> serviceListe = new List<Service>();
@@ -69,12 +83,44 @@
         await context.Auftraege.AddAsync(auftrag);
         await context.SaveChangesAsync();
 
-        Navigation.NavigateTo($"/auftraege/view");
+        MudDialog.Cancel();
     }
 
 
     private string GetSelectedServiceNames(List<string> selectedValues)
     {
         return string.Join(", ", selectedServices.Select(s => s.ServiceName));
+    }
+
+    private async Task OpenCreateKunde()
+    {
+        var options = new DialogOptions()
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        };
+
+        var dialog = DialogService.Show<CreateKunde>("", options);
+        var result = await dialog.Result;
+        using var context = await DbFactory.CreateDbContextAsync();
+        kundenListe = await context.Kunden.ToListAsync();
+        StateHasChanged();
+    }
+
+    private async Task OpenCreateService()
+    {
+        var options = new DialogOptions()
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        };
+
+        var dialog = DialogService.Show<CreateService>("", options);
+        var result = await dialog.Result;
+        using var context = await DbFactory.CreateDbContextAsync();
+        serviceListe = await context.Services.ToListAsync();
+        StateHasChanged();
     }
 }

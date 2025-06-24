@@ -1,4 +1,8 @@
 ﻿@page "/"
+@using CRM.Components.Pages.Auftrag
+
+<MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Inherit" Edge="Edge.End" OnClick="OpenCreateAuftrag" Size="Size.Large" />
+
 <div style="overflow-x: auto; white-space: nowrap;">
     <MudDropContainer T="Backend.Models.Auftrag"
                       Items="auftragListe"
@@ -30,6 +34,9 @@
 </div>
 
 @code {
+
+
+
     private List<Status> statusListe = new();
     private List<Backend.Models.Auftrag> auftragListe = new();
 
@@ -42,25 +49,23 @@
 
     }
 
-    // private List<CrmItem> _items = new()
-    // {
-    //     new CrmItem { CustomerName = "Kunde A", Services = new() { "Beratung", "Support" }, TotalValue = 1200, Stage = "1" },
-    //     new CrmItem { CustomerName = "Kunde B", Services = new() { "Entwicklung" }, TotalValue = 3000, Stage = "1" },
-    //     new CrmItem { CustomerName = "Kunde C", Services = new() { "Hosting", "Wartung" }, TotalValue = 1800, Stage = "2" },
-    //     new CrmItem { CustomerName = "Kunde D", Services = new() { "Analyse" }, TotalValue = 950, Stage = "3" },
-    //     new CrmItem { CustomerName = "Kunde E", Services = new() { "Beratung", "Training" }, TotalValue = 2200, Stage = "4" }
-    // };
-
     private void OnItemDropped(MudItemDropInfo<Backend.Models.Auftrag> dropInfo)
     {
         dropInfo.Item.Position = dropInfo.DropzoneIdentifier;
     }
 
-    // public class CrmItem
-    // {
-    //     public string CustomerName { get; set; }
-    //     public List<string> Services { get; set; }
-    //     public decimal TotalValue { get; set; }
-    //     public string Stage { get; set; }
-    // }
+    private async Task OpenCreateAuftrag()
+    {
+        var options = new DialogOptions()
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        };
+
+        var dialog = DialogService.Show<CreateAuftrag>("", options);
+        var result = await dialog.Result;
+
+        Navigation.NavigateTo(Navigation.Uri, true);
+    }
 }
