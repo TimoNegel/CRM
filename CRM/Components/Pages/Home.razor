@@ -23,7 +23,7 @@
         </ChildContent>
         <ItemRenderer>
             <MudListItem T="string">
-                <div>
+                <div onclick="@(() => OpenViewAuftrag(context))">
                     <strong>@context.Kunde.Firmenname</strong><br />
                     <em>Services:</em> @string.Join(", ", context.Services.Select(n => n.ServiceName))<br />
                     <em>Wert:</em> @context.AuftragsValue.ToString("C")
@@ -34,9 +34,6 @@
 </div>
 
 @code {
-
-
-
     private List<Status> statusListe = new();
     private List<Backend.Models.Auftrag> auftragListe = new();
 
@@ -49,9 +46,17 @@
 
     }
 
-    private void OnItemDropped(MudItemDropInfo<Backend.Models.Auftrag> dropInfo)
+    private async Task OnItemDropped(MudItemDropInfo<Backend.Models.Auftrag> dropInfo)
     {
         dropInfo.Item.Position = dropInfo.DropzoneIdentifier;
+        using var context = await DbFactory.CreateDbContextAsync();
+
+        var auftrag = context.Auftraege.FirstOrDefault(x => x.Id == dropInfo.Item.Id);
+
+        auftrag.Position = dropInfo.DropzoneIdentifier;
+        await context.SaveChangesAsync();
+
+
     }
 
     private async Task OpenCreateAuftrag()
@@ -68,4 +73,21 @@
 
         Navigation.NavigateTo(Navigation.Uri, true);
     }
+
+    private void OpenViewAuftrag(Backend.Models.Auftrag auftrag)
+    {
+        var options = new DialogOptions()
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        };
+
+        var parameters = new DialogParameters
+        {
+            { "Id", auftrag.Id }
+        };
+
+        DialogService.Show<AuftragView>("", parameters, options);
+     }
 }

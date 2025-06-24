@@ -1,27 +1,46 @@
 ﻿@page "/auftrag/view/{Id:guid}"
+@using CRM.Components.Pages.Kunde
+@using CRM.Components.Pages.Service
 
-<MudText Typo="Typo.h4">Auftrag Details</MudText>
-<br />
 
-<MudCard>
-    <MudCardContent>
-        <MudText><b>Auftragswert:</b> @auftrag.AuftragsValue €</MudText>
-        <MudText><b>Kunde:</b> @auftrag.Kunde.Firmenname</MudText>
-        <MudText><b>Status:</b> @statusText</MudText>
-        <MudText><b>Services:</b></MudText>
-        @foreach(var service in auftrag.Services)
-        {
-            <MudText><b>Name:</b> @service.ServiceName  <b>Value:</b> @service.Preis</MudText>
-        }
+<MudDialog Class="pb-6 px-6">
+    <DialogContent>
+        <MudText Typo="Typo.h4">Auftrag Details</MudText>
+        <br />
 
-        
-    </MudCardContent>
+        <MudCard>
+            <MudCardContent>
+                <MudText><b>Auftragswert:</b> @auftrag.AuftragsValue €</MudText>
+                <MudText Style="cursor: pointer;" @onclick="@(() => OpenViewKunde(auftrag.Kunde))">
+                    <b>Kunde:</b> @auftrag.Kunde?.Firmenname
+                </MudText>
 
-    <MudCardActions>
-        <MudButton Color="Color.Primary" OnClick="() => NavigateToEditAuftragPage()">Bearbeiten</MudButton>
-        <MudButton Color="Color.Error" OnClick="() => DeleteAuftrag()">Löschen</MudButton>
-    </MudCardActions>
-</MudCard>
+                <MudText>
+                    <b>Status:</b> @statusText
+                </MudText>
+
+                <MudText>
+                    <b>Services:</b>
+                </MudText>
+
+                @foreach(var service in auftrag.Services ?? Enumerable.Empty<Service>())
+                {
+                    <MudText Style="cursor: pointer;" @onclick="@(() => OpenViewService(service))">
+                        <b>Name:</b> @service.ServiceName <b>Value:</b> @service.Preis
+                    </MudText>
+                }
+
+
+
+            </MudCardContent>
+
+            <MudCardActions>
+                <MudButton Color="Color.Primary" OnClick="() => NavigateToEditAuftragPage()">Bearbeiten</MudButton>
+                <MudButton Color="Color.Error" OnClick="() => DeleteAuftrag()">Löschen</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </DialogContent>
+</MudDialog>
 
 @code {
     [Parameter] public Guid Id { get; set; }
@@ -49,7 +68,41 @@
         {
             context.Auftraege.Remove(auftragToDelete);
             await context.SaveChangesAsync();
-            Navigation.NavigateTo("/auftraege/view");
+            Navigation.NavigateTo("/");
         }
+    }
+
+    private void OpenViewKunde(Kunde kunde)
+    {
+        var options = new DialogOptions()
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        };
+
+        var parameters = new DialogParameters
+        {
+            { "Id", kunde.Id }
+        };
+
+        DialogService.Show<KundeView>("", parameters, options);
+    }
+
+    private void OpenViewService(Service service)
+    {
+        var options = new DialogOptions()
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        };
+
+        var parameters = new DialogParameters
+        {
+            { "Id", service.Id }
+        };
+
+        DialogService.Show<ServiceView>("", parameters, options);
     }
 }
