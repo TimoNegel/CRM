@@ -1,4 +1,6 @@
 ﻿@page "/mitarbeiter/view/{Id:guid}"
+@attribute [Authorize(Roles = "Admin")]
+
 
 <MudText Typo="Typo.h4">Mitarbeiter Details</MudText>
 <br />

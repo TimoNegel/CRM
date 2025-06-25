@@ -1,4 +1,5 @@
-﻿@page "/service/view/{Id:guid}"
+﻿@attribute [Authorize]
+@page "/service/view/{Id:guid}"
 
 <MudText Typo="Typo.h4">Service Details</MudText>
 <br />

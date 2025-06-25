@@ -1,4 +1,5 @@
-﻿@page "/"
+﻿@attribute [Authorize]
+@page "/"
 @using CRM.Components.Pages.Auftrag
 @using CRM.Components.Pages.Status
 
@@ -14,12 +15,15 @@
                        Size="Size.Large"
                        Variant="Variant.Filled" />
 
-        <MudButton Class="ml-2"
-                   Color="Color.Primary"
-                   OnClick="OpenEditStatus"
-                   Variant="Variant.Filled">
-            Pipeline bearbeiten
-        </MudButton>
+
+        <AuthorizeView Roles="Admin">
+            <MudButton Class="ml-2"
+                       Color="Color.Primary"
+                       OnClick="OpenEditStatus"
+                       Variant="Variant.Filled">
+                Pipeline bearbeiten
+            </MudButton>
+        </AuthorizeView>
     </div>
 
     <div style="overflow-x: auto; white-space: nowrap;">
@@ -54,7 +58,15 @@
 }
 else
 {
-    <CRM.Components.Pages.Status.CreateStatus />
+
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <CRM.Components.Pages.Status.CreateStatus />
+        </Authorized>
+        <NotAuthorized>
+            <MudText Typo="Typo.h3" Color="Color.Error">Setze dich mit dem Administrator in Verbindung, um die Pipeline erstellen zu lassen.</MudText>
+        </NotAuthorized>
+    </AuthorizeView>
 }
 
 @code {

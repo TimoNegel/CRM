@@ -3,14 +3,18 @@
 @inject NavigationManager NavigationManager
 
 <MudNavMenu>
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="/kunden/view" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">Kunden</MudNavLink>
-    <MudNavLink Href="/mitarbeiter/view" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">Mitarbeiter</MudNavLink>
-    <MudNavLink Href="/services/view" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DesignServices">Services</MudNavLink>
-    <MudSpacer />
     <MudDivider />
     <AuthorizeView>
         <Authorized>
+            <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="/kunden/view" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">Kunden</MudNavLink>
+
+            <AuthorizeView Roles="Admin" Context="adminContext">
+                <MudNavLink Href="/mitarbeiter/view" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">Mitarbeiter</MudNavLink>
+            </AuthorizeView>
+
+            <MudNavLink Href="/services/view" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DesignServices">Services</MudNavLink>
+            <MudSpacer />
             <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">@context.User.Identity?.Name</MudNavLink>
             <form action="Account/Logout" method="post">
                 <AntiforgeryToken />

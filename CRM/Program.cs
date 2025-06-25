@@ -40,6 +40,7 @@ builder.Services.AddDbContextFactory<CrmDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<CrmUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<CrmDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
@@ -47,6 +48,21 @@ builder.Services.AddIdentityCore<CrmUser>(options => options.SignIn.RequireConfi
 builder.Services.AddSingleton<IEmailSender<CrmUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
+
+using(var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    string[] roles = { "Admin", "Mitarbeiter" };
+
+    foreach(var role in roles)
+    {
+        if(!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
+
 
 //Database initialization
 //DbInitializer.Seed(app.Services);

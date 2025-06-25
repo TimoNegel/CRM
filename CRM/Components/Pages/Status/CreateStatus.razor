@@ -1,4 +1,6 @@
 ﻿@page "/status-editor"
+@attribute [Authorize(Roles = "Admin")]
+
 
 <MudPaper Class="pa-4" Elevation="4">
     <MudText Typo="Typo.h5">CRM-Pipeline erstellen</MudText>

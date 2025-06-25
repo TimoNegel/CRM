@@ -1,4 +1,6 @@
 ﻿@page "/mitarbeiter/view"
+@attribute [Authorize(Roles = "Admin")]
+
 
 <MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateMitarbeiterPage()">Mitarbeiter hinzufügen</MudButton>
 

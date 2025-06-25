@@ -2,6 +2,7 @@
 @using System.Net.Http.Json
 @using CRM.Data
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using MudBlazor.StaticInput
 @using Microsoft.AspNetCore.Components.Forms
@@ -12,7 +13,7 @@
 @using Microsoft.JSInterop
 @using MudBlazor
 @using MudBlazor.Services
-
+@using Microsoft.AspNetCore.Authorization
 
 @using CRM
 @using CRM.Components
@@ -22,6 +23,10 @@
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
 @inject Backend.Services.CurrentUserService CurrentUserService
+@inject UserManager<CrmUser> userManager
+
+
+
 
 
 

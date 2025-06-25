@@ -1,4 +1,5 @@
 ﻿@page "/mitarbeiter/edit/{Id:guid}"
+@attribute [Authorize(Roles = "Admin")]
 
 <MudText Typo="Typo.h4">Mitarbeiter bearbeiten</MudText>
 <br />
@@ -6,6 +7,12 @@
 <MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateMitarbeiter" Model="mitarbeiter">
     <MudTextField @bind-Value="mitarbeiter.Vorname" Label="Vorname" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Nachname" Label="Nachname" Required="true" />
+
+    <MudSelect @bind-Value="userRole" Label="Rolle" Required="true">
+        <MudSelectItem Value="@("Mitarbeiter")">Mitarbeiter</MudSelectItem>
+        <MudSelectItem Value="@("Admin")">Admin</MudSelectItem>
+    </MudSelect>
+
     <MudTextField @bind-Value="mitarbeiter.Email" Label="E-Mail" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Telefonnummer" Label="Telefonnummer" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Adresse.Strasse" Label="Straße" Required="true" />
@@ -36,6 +43,7 @@
     private List<Team> teamListe = new List<Team>();
     private Team selectedTeam;
     private string neuerTeamName = string.Empty;
+    private string userRole = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,14 +57,32 @@
 
         selectedTeam = mitarbeiter.Team;
 
+        var user = await userManager.FindByIdAsync(mitarbeiter.Id);
+        if(user != null)
+        {
+            var currentRole = await userManager.GetRolesAsync(user);
+            userRole = currentRole[0];
+        }
+
     }
 
     private async Task UpdateMitarbeiter()
     {
         using var context = DbFactory.CreateDbContext();
         mitarbeiter.Team = context.Teams.FirstOrDefault(x => x.Id == selectedTeam.Id);
+
         context.Users.Update(mitarbeiter);
         await context.SaveChangesAsync();
+
+        var user = await userManager.FindByIdAsync(mitarbeiter.Id);
+        if(user != null)
+        {
+            var currentRole = await userManager.GetRolesAsync(user);
+
+            await userManager.RemoveFromRoleAsync(user, currentRole[0]);
+
+            await userManager.AddToRoleAsync(user, userRole);
+        }
 
         Navigation.NavigateTo($"/mitarbeiter/view");
     }
