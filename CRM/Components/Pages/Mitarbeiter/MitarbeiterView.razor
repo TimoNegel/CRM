@@ -9,6 +9,8 @@
     <MudCardContent>
         <MudText><b>Vorname:</b> @mitarbeiter.Vorname</MudText>
         <MudText><b>Nachname:</b> @mitarbeiter.Nachname</MudText>
+        <MudText><b>Team:</b> @mitarbeiter.Team.Name</MudText>
+        <MudText><b>Rolle:</b> @rolle</MudText>
         <MudText><b>E-Mail:</b> @mitarbeiter.Email</MudText>
         <MudText><b>Telefonnummer:</b> @mitarbeiter.Telefonnummer</MudText>
 
@@ -29,11 +31,13 @@
 @code {
     [Parameter] public Guid Id { get; set; }
     private CrmUser mitarbeiter = new CrmUser { Adresse = new Adresse() };
+    private string rolle = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        mitarbeiter = await context.Users.Include(m => m.Adresse).FirstOrDefaultAsync(m => m.IdGuid == Id) ?? new CrmUser();
+        mitarbeiter = await context.Users.Include(m => m.Adresse).Include(m => m.Team).FirstOrDefaultAsync(m => m.IdGuid == Id) ?? new CrmUser();
+        rolle = await GetMitarbeiterRole(mitarbeiter.Id);
     }
 
     private void NavigateToEditMitarbeiterPage()
@@ -51,5 +55,17 @@
             await context.SaveChangesAsync();
             Navigation.NavigateTo("/mitarbeiter/view");
         }
+    }
+
+    private async Task<string> GetMitarbeiterRole(string id)
+    {
+        var user = await userManager.FindByIdAsync(id);
+        if(user != null)
+        {
+            var currentRole = await userManager.GetRolesAsync(user);
+
+            return currentRole[0];
+        }
+        return string.Empty;
     }
 }
