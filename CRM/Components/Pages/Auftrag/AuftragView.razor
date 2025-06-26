@@ -45,6 +45,8 @@
 
 @code {
     [Parameter] public Guid Id { get; set; }
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
     private Auftrag auftrag = new Auftrag();
     private string statusText = string.Empty;
 
@@ -53,7 +55,7 @@
         using var context = DbFactory.CreateDbContext();
         auftrag = await context.Auftraege.Include(a => a.Kunde).Include(a => a.Services).FirstOrDefaultAsync(a => a.Id == Id);
         await context.Status.FirstOrDefaultAsync(s => s.Position == int.Parse(auftrag.Position)).ContinueWith(t => statusText = t.Result?.Name ?? "Unbekannt");
-        
+
     }
 
     private void NavigateToEditAuftragPage()
@@ -69,7 +71,7 @@
         {
             context.Auftraege.Remove(auftragToDelete);
             await context.SaveChangesAsync();
-            Navigation.NavigateTo("/");
+            MudDialog.Close();
         }
     }
 

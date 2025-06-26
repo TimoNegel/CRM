@@ -61,30 +61,60 @@
         userListe = await context.Users.Include(x => x.Adresse).Include(x => x.Team).ToListAsync();
     }
 
-    private async Task AddMitarbeiter()
+    @code {  
+        private async Task AddMitarbeiter()  
+        {  
+            mitarbeiter.IdGuid = Guid.NewGuid();  
+            mitarbeiter.Adresse.Id = Guid.NewGuid();  
+
+            using var context = DbFactory.CreateDbContext();  
+            mitarbeiter.Team = context.Teams.FirstOrDefault(x => x.Id == selectedTeam.Id);  
+            context.Adressen.Add(mitarbeiter.Adresse);  
+
+            context.Users.Update(mitarbeiter);  
+            await context.SaveChangesAsync();  
+
+            var user = await userManager.FindByIdAsync(mitarbeiter.Id);  
+            bool adminUserExists = await HasAnyAdminUserAsync();
+
+            if (user != null && adminUserExists)  
+            {  
+                var currentRole = await userManager.GetRolesAsync(user);  
+
+                if (currentRole.Count > 0)  
+                {  
+                    await userManager.RemoveFromRoleAsync(user, currentRole[0]);  
+                }  
+
+                await userManager.AddToRoleAsync(user, userRole);  
+                // await signInManager.SignOutAsync();
+                // Navigation.NavigateTo("/login", true);
+            }  
+
+            Navigation.NavigateTo($"/mitarbeiter/view");  
+        }  
+    }
+
+
+
+    private async Task<bool> HasAnyAdminUserAsync()
     {
-        mitarbeiter.IdGuid = Guid.NewGuid();
-        mitarbeiter.Adresse.Id = Guid.NewGuid();
+    var users = userManager.Users.ToList();
+    int count = 0;
 
-        using var context = DbFactory.CreateDbContext();
-        mitarbeiter.Team = context.Teams.FirstOrDefault(x => x.Id == selectedTeam.Id);
-        context.Adressen.Add(mitarbeiter.Adresse);
-
-        context.Users.Update(mitarbeiter);
-        await context.SaveChangesAsync();
-
-        var user = await userManager.FindByIdAsync(mitarbeiter.Id);
-        if(user != null)
+    foreach(var user in users)
+    {
+        if(await userManager.IsInRoleAsync(user, "Admin"))
         {
-            var currentRole = await userManager.GetRolesAsync(user);
-
-                await userManager.RemoveFromRoleAsync(user, currentRole[0]);
-
-                await userManager.AddToRoleAsync(user, userRole);
+            count++;
+            if(count == 2)
+                return true;
+        }
         }
 
-        Navigation.NavigateTo($"/mitarbeiter/view");
+        return false;
     }
+
 
     private async Task AddNewTeam()
     {

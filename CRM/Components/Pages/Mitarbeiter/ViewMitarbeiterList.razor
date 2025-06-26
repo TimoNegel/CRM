@@ -11,7 +11,7 @@
         <PropertyColumn Property="x => x.Team.Name" Title="Team Name"/>
         <PropertyColumn Property="x => x.Email" />
         <PropertyColumn Property="x => x.Telefonnummer" />
-        <PropertyColumn Property="x => x.Adresse.FormatierteAdresse" />
+        <PropertyColumn Property="x => x.Adresse.FormatierteAdresse" Title="Adresse" />
         <TemplateColumn CellClass="d-flex justify-center">
             <CellTemplate Context="context">
                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditMitarbeiterPage(context.Item.IdGuid)" />

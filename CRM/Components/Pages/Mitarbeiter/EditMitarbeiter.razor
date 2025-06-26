@@ -8,11 +8,6 @@
     <MudTextField @bind-Value="mitarbeiter.Vorname" Label="Vorname" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Nachname" Label="Nachname" Required="true" />
 
-    <MudSelect @bind-Value="userRole" Label="Rolle" Required="true">
-        <MudSelectItem Value="@("Mitarbeiter")">Mitarbeiter</MudSelectItem>
-        <MudSelectItem Value="@("Admin")">Admin</MudSelectItem>
-    </MudSelect>
-
     <MudTextField @bind-Value="mitarbeiter.Email" Label="E-Mail" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Telefonnummer" Label="Telefonnummer" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Adresse.Strasse" Label="Straße" Required="true" />
@@ -35,6 +30,15 @@
         Änderungen speichern
     </MudButton>
 </MudForm>
+
+
+<MudSelect Class="mt-5" @bind-Value="userRole" Label="Rolle" Required="true">
+    <MudSelectItem Value="@("Mitarbeiter")">Mitarbeiter</MudSelectItem>
+    <MudSelectItem Value="@("Admin")">Admin</MudSelectItem>
+</MudSelect>
+<MudButton OnClick="ChangeRolle" Variant="Variant.Filled" Color="Color.Primary">
+    Rolle ändern
+</MudButton>
 
 @code {
     [Parameter] public Guid Id { get; set; }
@@ -71,21 +75,55 @@
         using var context = DbFactory.CreateDbContext();
         mitarbeiter.Team = context.Teams.FirstOrDefault(x => x.Id == selectedTeam.Id);
 
+
         context.Users.Update(mitarbeiter);
         await context.SaveChangesAsync();
-
-        var user = await userManager.FindByIdAsync(mitarbeiter.Id);
-        if(user != null)
-        {
-            var currentRole = await userManager.GetRolesAsync(user);
-
-            await userManager.RemoveFromRoleAsync(user, currentRole[0]);
-
-            await userManager.AddToRoleAsync(user, userRole);
-        }
-
         Navigation.NavigateTo($"/mitarbeiter/view");
     }
+
+    private async Task ChangeRolle()
+    {
+        if(string.IsNullOrWhiteSpace(userRole))
+            return;
+        var user = await userManager.FindByIdAsync(mitarbeiter.Id);
+        bool adminUserExists = await HasAnyAdminUserAsync();
+
+        if(user != null && adminUserExists)
+        {
+            var currentRole = await userManager.GetRolesAsync(user);
+            if(currentRole.Count > 0)
+            {
+                await userManager.RemoveFromRoleAsync(user, currentRole[0]);
+            }
+            await userManager.AddToRoleAsync(user, userRole);
+
+            // await signInManager.SignOutAsync();
+            // Navigation.NavigateTo("/login", true);
+
+        }
+    }
+
+            private async Task<bool> HasAnyAdminUserAsync()
+    {
+        var users = userManager.Users.ToList();
+        int count = 0;
+
+        foreach(var user in users)
+        {
+            if(await userManager.IsInRoleAsync(user, "Admin"))
+            {
+                count++;
+                if(count == 2)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+
+
+    
 
     private async Task AddNewTeam()
     {

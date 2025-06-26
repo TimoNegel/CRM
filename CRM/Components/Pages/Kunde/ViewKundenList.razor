@@ -10,8 +10,7 @@
         <PropertyColumn Property="x => x.AnsprechpartnerNachname" />
         <PropertyColumn Property="x => x.Tel" />
         <PropertyColumn Property="x => x.Email" />
-        <PropertyColumn Property="x => x.Adresse.Ort" />
-        <PropertyColumn Property="x => x.Adresse.PLZ" />
+        <PropertyColumn Property="x => x.Adresse.FormatierteAdresse" Title="Adresse" />
         <TemplateColumn CellClass="d-flex justify-center">
             <CellTemplate Context="context">
                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditKundePage(context.Item.Id)" />
