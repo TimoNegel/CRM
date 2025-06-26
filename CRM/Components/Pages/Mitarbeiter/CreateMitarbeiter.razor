@@ -70,7 +70,7 @@
             using var context = DbFactory.CreateDbContext();  
             mitarbeiter.Team = context.Teams.FirstOrDefault(x => x.Id == selectedTeam.Id);  
             context.Adressen.Add(mitarbeiter.Adresse);  
-
+            mitarbeiter.IsProfileComplete = true;
             context.Users.Update(mitarbeiter);  
             await context.SaveChangesAsync();  
 

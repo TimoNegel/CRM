@@ -8,6 +8,7 @@ namespace CRM.Data
         public Guid IdGuid { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsProfileComplete { get; set; } = false;
 
         public string Vorname { get; set; } = string.Empty;
         public string Nachname { get; set; } = string.Empty;

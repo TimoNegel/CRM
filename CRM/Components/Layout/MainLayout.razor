@@ -25,7 +25,42 @@
 </div>
 
 @code {
+
+
+
     private bool _drawerOpen = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = await userManager.GetUserAsync(authState.User);
+
+        var currentUri = Navigation.ToBaseRelativePath(Navigation.Uri).ToLower();
+        var allowedPages = new[] { "mitarbeiter/create", "mitarbeiter/view", "profil-erstellen/mitarbeiter", "profil-erstellen/admin", "Account/RegisterConfirmation", "Account/Register", "Account/Login" };
+
+        var a = allowedPages.Any(p => currentUri.Contains(p));
+        if(user != null && !user.IsProfileComplete && !allowedPages.Any(p => currentUri.Contains(p)))
+        {
+
+            var rolle = await GetMitarbeiterRole(user.Id);
+            if(rolle == "Admin"){
+            Navigation.NavigateTo("/profil-erstellen/admin", true);} else{
+            Navigation.NavigateTo("/profil-erstellen/mitarbeiter", true);}
+
+        }
+    }
+
+    private async Task<string> GetMitarbeiterRole(string id)
+    {
+        var user = await userManager.FindByIdAsync(id);
+        if(user != null)
+        {
+            var currentRole = await userManager.GetRolesAsync(user);
+
+            return currentRole[0];
+        }
+        return string.Empty;
+    }
 }
 
 
