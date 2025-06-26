@@ -26,8 +26,7 @@
         </AuthorizeView>
     </div>
 
-    <div style="overflow-x: auto; white-space: nowrap;
-        margin: 0 auto;">
+    <div style="overflow-x: auto; white-space: nowrap;">
         <MudDropContainer T="Backend.Models.Auftrag"
                           Items="auftragListe"
                           ItemsSelector="@((item, dropzone) => item.Position == dropzone)"
@@ -136,7 +135,7 @@ else
         Navigation.NavigateTo(Navigation.Uri, true);
     }
 
-    private async Task OpenViewAuftrag(Backend.Models.Auftrag auftrag)
+    private void OpenViewAuftrag(Backend.Models.Auftrag auftrag)
     {
         var options = new DialogOptions()
         {
@@ -150,11 +149,7 @@ else
             { "Id", auftrag.Id }
         };
 
-        
-        var dialog = DialogService.Show<AuftragView>("", parameters, options);
-        var result = await dialog.Result;
-
-        Navigation.NavigateTo(Navigation.Uri, true);
+        DialogService.Show<AuftragView>("", parameters, options);
     }
 
     private void OpenEditStatus()

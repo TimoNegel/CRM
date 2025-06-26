@@ -101,12 +101,12 @@
         existingAuftrag.Kunde = await context.Kunden
             .FirstOrDefaultAsync(k => k.Id == auftrag.Kunde.Id);
 
-        existingAuftrag.Position = auftrag.Position;
-
         // Auftragswert berechnen
         existingAuftrag.AuftragsValue = existingAuftrag.Services.Sum(s => s.Preis);
+
         await context.SaveChangesAsync();
-        Navigation.NavigateTo("/");
+
+        Navigation.NavigateTo($"/");
     }
 
     private string GetSelectedServiceNames(List<string> selectedValues)

@@ -1,7 +1,7 @@
 ﻿@page "/mitarbeiter/view"
 @attribute [Authorize(Roles = "Admin")]
 
-        
+
 <MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateMitarbeiterPage()">Mitarbeiter hinzufügen</MudButton>
 
 <MudDataGrid T="CrmUser" Items="@mitarbeiterListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default" RowClick="@((context) => NavigateToViewMitarbeiterPage(context.Item.IdGuid))">
@@ -9,20 +9,9 @@
         <PropertyColumn Property="x => x.Vorname" />
         <PropertyColumn Property="x => x.Nachname" />
         <PropertyColumn Property="x => x.Team.Name" Title="Team Name"/>
-        <TemplateColumn Title="Rolle">
-            <CellTemplate Context="context">
-                @if(rollenDictionary.TryGetValue(context.Item.Id, out var rolle))
-                {
-                    @rolle
-                }
-                else
-                {
-                    <span>Lädt...</span>
-                }
-            </CellTemplate>
-        </TemplateColumn>        <PropertyColumn Property="x => x.Email" />
+        <PropertyColumn Property="x => x.Email" />
         <PropertyColumn Property="x => x.Telefonnummer" />
-        <PropertyColumn Property="x => x.Adresse.FormatierteAdresse" Title="Adresse" />
+        <PropertyColumn Property="x => x.Adresse.FormatierteAdresse" />
         <TemplateColumn CellClass="d-flex justify-center">
             <CellTemplate Context="context">
                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditMitarbeiterPage(context.Item.IdGuid)" />
@@ -34,18 +23,11 @@
 
 @code {
     private List<CrmUser> mitarbeiterListe = new();
-    private Dictionary<string, string> rollenDictionary = new();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = await DbFactory.CreateDbContextAsync();
         mitarbeiterListe = await context.Users.Include(m => m.Adresse).Include(m => m.Team).ToListAsync();
-
-        foreach(var user in mitarbeiterListe)
-        {
-            var rolle = await GetMitarbeiterRole(user.Id);
-            rollenDictionary[user.Id] = rolle;
-        }
     }
 
     private async Task DeleteMitarbeiter(Guid mitarbeiterId)
@@ -74,17 +56,5 @@
     private void NavigateToCreateMitarbeiterPage()
     {
         Navigation.NavigateTo($"/mitarbeiter/create");
-    }
-
-    private async Task<string> GetMitarbeiterRole(string id)
-    {
-        var user = await userManager.FindByIdAsync(id);
-        if(user != null)
-        {
-            var currentRole = await userManager.GetRolesAsync(user);
-
-            return currentRole[0];
-        }
-        return string.Empty;
     }
 }
