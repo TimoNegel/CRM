@@ -88,19 +88,21 @@
         var user = await userManager.FindByIdAsync(mitarbeiter.Id);
         bool adminUserExists = await HasAnyAdminUserAsync();
 
-        if(user != null && adminUserExists)
+        if(user != null)
         {
             var currentRole = await userManager.GetRolesAsync(user);
-            if(currentRole.Count > 0)
+
+            if(userRole == "Admin" || adminUserExists)
             {
+
                 await userManager.RemoveFromRoleAsync(user, currentRole[0]);
+
+                await userManager.AddToRoleAsync(user, userRole);
+
             }
-            await userManager.AddToRoleAsync(user, userRole);
-
-            // await signInManager.SignOutAsync();
-            // Navigation.NavigateTo("/login", true);
-
         }
+        Navigation.NavigateTo($"/mitarbeiter/view");
+
     }
 
             private async Task<bool> HasAnyAdminUserAsync()
