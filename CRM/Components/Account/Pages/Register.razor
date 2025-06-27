@@ -33,17 +33,17 @@
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.Email)" @bind-Value="Input.Email"
                                         Label="Email" Placeholder="name@example.com"
-                                        UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
+                                        UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } })" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
                                         Label="Password" InputType="InputType.Password" Placeholder="password"
-                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } })" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
                                         Label="Confirm Password" InputType="InputType.Password" Placeholder="confirm password"
-                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } })" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Register</MudStaticButton>
@@ -67,13 +67,13 @@
     public async Task RegisterUser(EditContext editContext)
     {
         var user = CreateUser();
-
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+        user.EmailConfirmed = true;
         var result = await UserManager.CreateAsync(user, Input.Password);
 
-        if (!result.Succeeded)
+        if(!result.Succeeded)
         {
             identityErrors = result.Errors;
             return;
@@ -97,12 +97,12 @@
 
         await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
 
-        if (UserManager.Options.SignIn.RequireConfirmedAccount)
-        {
-            RedirectManager.RedirectTo(
-                "Account/RegisterConfirmation",
-                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
-        }
+        // if(UserManager.Options.SignIn.RequireConfirmedAccount)
+        // {
+        //     RedirectManager.RedirectTo(
+        //         "Account/RegisterConfirmation",
+        //         new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+        // }
 
         await SignInManager.SignInAsync(user, isPersistent: false);
         RedirectManager.RedirectTo(ReturnUrl);
@@ -123,7 +123,7 @@
 
     private IUserEmailStore<CrmUser> GetEmailStore()
     {
-        if (!UserManager.SupportsUserEmail)
+        if(!UserManager.SupportsUserEmail)
         {
             throw new NotSupportedException("The default UI requires a user store with email support.");
         }
