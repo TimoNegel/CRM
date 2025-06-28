@@ -1,44 +1,45 @@
 ﻿@page "/mitarbeiter/edit/{Id:guid}"
 @attribute [Authorize(Roles = "Admin")]
 
-<MudText Typo="Typo.h4">Mitarbeiter bearbeiten</MudText>
+<MudText Typo="Typo.h4" Class="mb-2" Style="font-weight:600; color:#1976d2;">Mitarbeiter bearbeiten</MudText>
 <br />
 
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateMitarbeiter" Model="mitarbeiter">
-    <MudTextField @bind-Value="mitarbeiter.Vorname" Label="Vorname" Required="true" />
-    <MudTextField @bind-Value="mitarbeiter.Nachname" Label="Nachname" Required="true" />
+<MudForm Class="pa-4"
+         Style="border-radius:16px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0; background:#fff;"
+         onsubmit="@UpdateMitarbeiter" Model="mitarbeiter">
+    <MudTextField @bind-Value="mitarbeiter.Vorname" Label="Vorname" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="mitarbeiter.Nachname" Label="Nachname" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="mitarbeiter.Email" Label="E-Mail" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="mitarbeiter.Telefonnummer" Label="Telefonnummer" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Strasse" Label="Straße" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Hausnummer" Label="Hausnummer" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Ort" Label="Ort" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.PLZ" Label="PLZ" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="mitarbeiter.Adresse.Land" Label="Land" Required="true" Style="margin-bottom:14px;" />
 
-    <MudTextField @bind-Value="mitarbeiter.Email" Label="E-Mail" Required="true" />
-    <MudTextField @bind-Value="mitarbeiter.Telefonnummer" Label="Telefonnummer" Required="true" />
-    <MudTextField @bind-Value="mitarbeiter.Adresse.Strasse" Label="Straße" Required="true" />
-    <MudTextField @bind-Value="mitarbeiter.Adresse.Hausnummer" Label="Hausnummer" Required="true" />
-    <MudTextField @bind-Value="mitarbeiter.Adresse.Ort" Label="Ort" Required="true" />
-    <MudTextField @bind-Value="mitarbeiter.Adresse.PLZ" Label="PLZ" Required="true" />
-    <MudTextField @bind-Value="mitarbeiter.Adresse.Land" Label="Land" Required="true" />
-
-    <MudSelect @bind-Value="selectedTeam" Label="Team" Required="true">
+    <MudSelect @bind-Value="selectedTeam" Label="Team" Required="true" Style="margin-bottom:14px;">
         @foreach(var k in teamListe)
         {
             <MudSelectItem Value="@k">@k.Name</MudSelectItem>
         }
     </MudSelect>
 
-    <MudTextField @bind-Value="neuerTeamName" Label="Neues Team" />
-    <MudButton OnClick="AddNewTeam">Neues Team anlegen</MudButton>
-    <br />
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+    <MudTextField @bind-Value="neuerTeamName" Label="Neues Team" Style="margin-bottom:14px;" />
+    <MudButton OnClick="AddNewTeam" Style="border-radius:8px; min-width:140px; margin-bottom:14px;">Neues Team anlegen</MudButton>
+
+    <MudSelect Class="mt-5" @bind-Value="userRole" Label="Rolle" Required="true" Style="margin-bottom:14px;">
+        <MudSelectItem Value="@("Mitarbeiter")">Mitarbeiter</MudSelectItem>
+        <MudSelectItem Value="@("Admin")">Admin</MudSelectItem>
+    </MudSelect>
+    <MudButton class="mt-2" OnClick="ChangeRolle" Variant="Variant.Filled" Color="Color.Primary" Style="border-radius:8px; min-width:140px; margin-bottom:14px;">
+        Rolle ändern
+    </MudButton>
+
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"
+               Style="border-radius:8px; min-width:140px; margin-top:12px;">
         Änderungen speichern
     </MudButton>
 </MudForm>
-
-
-<MudSelect Class="mt-5" @bind-Value="userRole" Label="Rolle" Required="true">
-    <MudSelectItem Value="@("Mitarbeiter")">Mitarbeiter</MudSelectItem>
-    <MudSelectItem Value="@("Admin")">Admin</MudSelectItem>
-</MudSelect>
-<MudButton class="mt-2" OnClick="ChangeRolle" Variant="Variant.Filled" Color="Color.Primary">
-    Rolle ändern
-</MudButton>
 
 @code {
     [Parameter] public Guid Id { get; set; }

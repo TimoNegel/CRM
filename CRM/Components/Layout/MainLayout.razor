@@ -5,9 +5,12 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
-    <MudAppBar Elevation="1">
+    <MudAppBar Elevation="0" Dense="true"
+        Style="backdrop-filter:blur(12px); background:rgba(30, 32, 38, 0.85);box-shadow:0 4px 24px #0008;">
         <MudStaticNavDrawerToggle DrawerId="nav-drawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-        <MudText Typo="Typo.h5" Class="ml-3">CRM</MudText>
+        <img src="images/crm-logo.png" alt="CRM Logo" style="height:38px; margin-left:18px; margin-right:10px;" />
+        <MudText Typo="Typo.h5" Class="ml-1" Style="font-weight:700; letter-spacing:1px; color:#fff;">CRM-DEMO</MudText>
+        <MudSpacer />
     </MudAppBar>
     <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
@@ -17,13 +20,11 @@
     </MudMainContent>
 </MudLayout>
 
-
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
-
 @code {
 
 

@@ -5,7 +5,6 @@
 
 @if(statusListe.Any())
 {
-
     <div class="d-flex justify-end align-center mb-5">
         <MudIconButton Class="mr-5"
                        Icon="@Icons.Material.Filled.Add"
@@ -13,44 +12,62 @@
                        Edge="Edge.End"
                        OnClick="OpenCreateAuftrag"
                        Size="Size.Large"
-                       Variant="Variant.Filled" />
-
+                       Variant="Variant.Filled"
+                       Style="box-shadow: 0 2px 8px #1976d21a; border-radius: 10px;" />
 
         <AuthorizeView Roles="Admin">
             <MudButton Class="ml-2"
                        Color="Color.Primary"
                        OnClick="OpenEditStatus"
-                       Variant="Variant.Filled">
+                       Variant="Variant.Filled"
+                       Style="box-shadow: 0 2px 8px #1976d21a; border-radius: 10px;">
                 Pipeline bearbeiten
             </MudButton>
         </AuthorizeView>
     </div>
 
-    <div style="overflow-x: auto; white-space: nowrap;
-        margin: 0 auto;">
+    <div style="overflow-x: auto; overflow-y: hidden; white-space: nowrap; margin: 0 auto; background: #f7f7f7; padding: 0; display: flex; align-items: stretch; min-height: 400px ">
         <MudDropContainer T="Backend.Models.Auftrag"
                           Items="auftragListe"
                           ItemsSelector="@((item, dropzone) => item.Position == dropzone)"
                           ItemDropped="OnItemDropped"
                           Class="d-inline-flex flex-nowrap px-2"
-                          Style="min-height: 400px;">
+                          Style="height: 100%; min-height: 0;">
             <ChildContent>
                 @foreach(var stage in statusListe)
                 {
-                    <MudPaper Class="ma-2 pa-2 d-inline-block" Style="min-width: 280px; max-width: 320px;">
-                        <MudList T="string" Class="d-flex flex-column mud-height-full">
-                            <MudListSubheader>@stage.Name</MudListSubheader>
-                            <MudDropZone T="Backend.Models.Auftrag" Identifier="@stage.Position.ToString()" Class="flex-grow-1" />
-                        </MudList>
+                    <MudPaper Class="ma-3 pa-0 d-inline-block"
+                              Style="background: #fff; border-radius: 18px; box-shadow: 0 4px 24px #00000014, 0 1.5px 4px #0000000a; border: 1px solid #e0e0e0; min-width: 320px; max-width: 360px; height: 100%; display: flex; flex-direction: column; transition: box-shadow 0.2s;">
+                        <div style="color: #222; border-radius: 18px 18px 0 0; padding: 20px 0 16px 0; text-align: center; font-weight: 600; font-size: 1.15rem; letter-spacing: 0.5px; border-bottom: 1px solid #eee; box-shadow: 0 2px 8px #0000000a;">
+                            @stage.Name
+                        </div>
+                        <div style="padding: 18px; flex: 1; min-height: 100px; overflow-y: auto;">
+                            <MudDropZone T="Backend.Models.Auftrag"
+                                         Identifier="@stage.Position.ToString()"
+                                         Class="flex-grow-1"
+                                         Style="min-height: 100px;" />
+                        </div>
                     </MudPaper>
                 }
             </ChildContent>
             <ItemRenderer>
-                <MudListItem T="string">
-                    <div onclick="@(() => OpenViewAuftrag(context))">
-                        <strong>@context.Kunde.Firmenname</strong><br />
-                        <em>Services:</em> @string.Join(", ", context.Services.Select(n => n.ServiceName))<br />
-                        <em>Wert:</em> @context.AuftragsValue.ToString("C")
+                <MudListItem T="string"
+                    Style="border-radius: 14px; border: 1px solid #d1d5db; box-shadow: 0 2px 8px #0000000a; padding: 16px 14px 14px 14px; margin-bottom: 18px; background: linear-gradient(90deg, #f8fafc 80%, #e3f2fd 100%); cursor: grab; transition: box-shadow 0.2s;">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <div>
+                            <strong style="font-weight: 600; font-size: 1.05rem; border-bottom: 1px solid #f0f0f0; margin-bottom: 8px; color: #1976d2;">
+                                @context.Kunde.Firmenname
+                            </strong><br />
+                            <span style="font-size: 0.97em; color: #555;">
+                                <em>Services:</em> @string.Join(", ", context.Services.Select(n => n.ServiceName))<br />
+                                <em>Wert:</em> @context.AuftragsValue.ToString("C")
+                            </span>
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       Style="margin-left:8px;"
+                                       OnClick="@(() => OpenViewAuftrag(context))" />
                     </div>
                 </MudListItem>
             </ItemRenderer>
@@ -59,13 +76,14 @@
 }
 else
 {
-
     <AuthorizeView Roles="Admin">
         <Authorized>
             <CRM.Components.Pages.Status.CreateStatus />
         </Authorized>
         <NotAuthorized>
-            <MudText Typo="Typo.h3" Color="Color.Error">Setze dich mit dem Administrator in Verbindung, um die Pipeline erstellen zu lassen.</MudText>
+            <MudText Typo="Typo.h3" Color="Color.Error">
+                Setze dich mit dem Administrator in Verbindung, um die Pipeline erstellen zu lassen.
+            </MudText>
         </NotAuthorized>
     </AuthorizeView>
 }

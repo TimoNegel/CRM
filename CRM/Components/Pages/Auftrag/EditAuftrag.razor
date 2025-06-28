@@ -4,33 +4,46 @@
 <MudText Typo="Typo.h4">Auftrag bearbeiten</MudText>
 <br />              
 
-<MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@UpdateAuftrag" Model="auftrag">
-    <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true">
-        @foreach(var k in kundenListe)
-        {
-            <MudSelectItem Value="@k">@k.Firmenname</MudSelectItem>
-        }
-    </MudSelect>
+<MudDialog Class="pb-6 px-6" Style="max-width: 480px;">
+    <DialogContent>
+        <MudText Typo="Typo.h4" Class="mb-2" Style="font-weight:600; color:#1976d2;">Auftrag bearbeiten</MudText>
+        <MudForm Class="pa-4" Style="border-radius:16px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0; background:#fff;" onsubmit="@UpdateAuftrag" Model="auftrag">
+            <MudSelect @bind-Value="auftrag.Kunde" Label="Kunde" Required="true" Style="margin-bottom:18px;">
+                @foreach(var k in kundenListe)
+                {
+                    <MudSelectItem Value="@k">@k.Firmenname</MudSelectItem>
+                }
+            </MudSelect>
 
-    <MudSelect T="Service" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetSelectedServiceNames))" Label="Services" Required="true" MultiSelection="true" @bind-SelectedValues="selectedServices">
-        @foreach(var s in serviceListe)
-        {
-            <MudSelectItem Value="@s">@s.ServiceName</MudSelectItem>
-        }
-    </MudSelect>
+            <MudSelect T="Service"
+                       MultiSelectionTextFunc="@(new Func<List<string>, string>(GetSelectedServiceNames))"
+                       Label="Services"
+                       Required="true"
+                       MultiSelection="true"
+                       @bind-SelectedValues="selectedServices"
+                       Style="margin-bottom:18px;">
+                @foreach(var s in serviceListe)
+                {
+                    <MudSelectItem Value="@s">@s.ServiceName</MudSelectItem>
+                }
+            </MudSelect>
 
-    <MudSelect @bind-Value="auftrag.Position" Label="Status" Required="true">
-        @foreach(var s in statusListe)
-        {
-            <MudSelectItem Value="@s.Position.ToString()">@s.Name</MudSelectItem>
-        }
-    </MudSelect>
+            <MudSelect @bind-Value="auftrag.Position" Label="Status" Required="true" Style="margin-bottom:18px;">
+                @foreach(var s in statusListe)
+                {
+                    <MudSelectItem Value="@s.Position.ToString()">@s.Name</MudSelectItem>
+                }
+            </MudSelect>
 
-    <br />
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
-        Änderungen speichern
-    </MudButton>
-</MudForm>
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Style="border-radius:8px; min-width:140px; margin-top:12px;">
+                Änderungen speichern
+            </MudButton>
+        </MudForm>
+    </DialogContent>
+</MudDialog>
 
 @code {
     [Parameter] public Guid Id { get; set; }

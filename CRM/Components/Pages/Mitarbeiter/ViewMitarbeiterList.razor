@@ -2,9 +2,15 @@
 @attribute [Authorize(Roles = "Admin")]
 
 
-<MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateMitarbeiterPage()">Mitarbeiter hinzufügen</MudButton>
+<MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" Style="border-radius:10px; box-shadow:0 2px 8px #1976d21a;" OnClick="() => NavigateToCreateMitarbeiterPage()">Mitarbeiter hinzufügen</MudButton>
 
-<MudDataGrid T="CrmUser" Items="@mitarbeiterListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default" RowClick="@((context) => NavigateToViewMitarbeiterPage(context.Item.IdGuid))">
+<MudDataGrid T="CrmUser"
+             Items="@mitarbeiterListe"
+             Filterable="true"
+             FilterMode="DataGridFilterMode.ColumnFilterMenu"
+             FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default"
+             RowClick="@((context) => NavigateToViewMitarbeiterPage(context.Item.IdGuid))"
+             Style="border-radius:18px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0; background:#fff; margin:0 auto;">
     <Columns>
         <PropertyColumn Property="x => x.Vorname" />
         <PropertyColumn Property="x => x.Nachname" />
@@ -14,8 +20,8 @@
         <PropertyColumn Property="x => x.Adresse.FormatierteAdresse" Title="Adresse" />
         <TemplateColumn CellClass="d-flex justify-center">
             <CellTemplate Context="context">
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditMitarbeiterPage(context.Item.IdGuid)" />
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteMitarbeiter(context.Item.IdGuid)" />
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Style="margin-right:4px;" OnClick="() => NavigateToEditMitarbeiterPage(context.Item.IdGuid)" />
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="() => DeleteMitarbeiter(context.Item.IdGuid)" />
             </CellTemplate>
         </TemplateColumn>
     </Columns>

@@ -1,26 +1,30 @@
 ﻿@attribute [Authorize]
 @page "/kunde/create"
 
-        <MudText Typo="Typo.h4">Kunde hinzufügen</MudText>
-        <br />
+        <MudText Typo="Typo.h4" Class="mb-2" Style="font-weight:600; color:#1976d2;">Kunde hinzufügen</MudText>
+<br />
 
-        <MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddKunde" Model="kunde">
-            <MudTextField @bind-Value="kunde.Firmenname" Label="Firmenname" Required="true" />
-            <MudTextField @bind-Value="kunde.AnsprechpartnerVorname" Label="Ansprechpartner Vorname" Required="true" />
-            <MudTextField @bind-Value="kunde.AnsprechpartnerNachname" Label="Ansprechpartner Nachname" Required="true" />
-            <MudTextField @bind-Value="kunde.Tel" Label="Telefonnummer" Required="true" />
-            <MudTextField @bind-Value="kunde.Email" Label="E-Mail" Required="true" />
-            <MudTextField @bind-Value="kunde.Adresse.Strasse" Label="Straße" Required="true" />
-            <MudTextField @bind-Value="kunde.Adresse.Hausnummer" Label="Hausnummer" Required="true" />
-            <MudTextField @bind-Value="kunde.Adresse.Ort" Label="Ort" Required="true" />
-            <MudTextField @bind-Value="kunde.Adresse.PLZ" Label="PLZ" Required="true" />
-            <MudTextField @bind-Value="kunde.Adresse.Land" Label="Land" Required="true" />
+<MudForm Class="pa-4"
+         Style="border-radius:16px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0; background:#fff;"
+         onsubmit="@AddKunde" Model="kunde">
+    <MudTextField @bind-Value="kunde.Firmenname" Label="Firmenname" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="kunde.AnsprechpartnerVorname" Label="Ansprechpartner Vorname" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="kunde.AnsprechpartnerNachname" Label="Ansprechpartner Nachname" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="kunde.Tel" Label="Telefonnummer" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="kunde.Email" Label="E-Mail" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="kunde.Adresse.Strasse" Label="Straße" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="kunde.Adresse.Hausnummer" Label="Hausnummer" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="kunde.Adresse.Ort" Label="Ort" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="kunde.Adresse.PLZ" Label="PLZ" Required="true" Style="margin-bottom:14px;" />
+    <MudTextField @bind-Value="kunde.Adresse.Land" Label="Land" Required="true" Style="margin-bottom:14px;" />
 
-            <br />
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
-                Kunde hinzufügen
-            </MudButton>
-        </MudForm>
+    <MudButton ButtonType="ButtonType.Submit"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               Style="border-radius:8px; min-width:140px; margin-top:12px;">
+        Kunde hinzufügen
+    </MudButton>
+</MudForm>
 
 
 @code {

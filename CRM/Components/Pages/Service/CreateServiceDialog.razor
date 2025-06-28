@@ -1,16 +1,18 @@
 ﻿@attribute [Authorize]
-<MudDialog Class="pb-6 px-6">
+<MudDialog Class="pb-6 px-6" Style="max-width: 480px;">
     <DialogContent>
-        <MudText Typo="Typo.h4">Service hinzufügen</MudText>
-        <br />
+        <MudText Typo="Typo.h4" Class="mb-2" Style="font-weight:600; color:#1976d2;">Service hinzufügen</MudText>
+        <MudForm Class="pa-4"
+                 Style="border-radius:16px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0; background:#fff;"
+                 onsubmit="@AddService" Model="service">
+            <MudTextField @bind-Value="service.ServiceName" Label="Service Name" Required="true" Style="margin-bottom:14px;" />
+            <MudTextField @bind-Value="service.AufwandsZeit" Label="Aufwandszeit (hh:mm:ss)" Required="true" Style="margin-bottom:14px;" />
+            <MudTextField @bind-Value="service.Preis" Label="Preis" Required="true" Style="margin-bottom:14px;" />
 
-        <MudForm Class="border-2 border-solid mud-border-primary pa-4" onsubmit="@AddService" Model="service">
-            <MudTextField @bind-Value="service.ServiceName" Label="Service Name" Required="true" />
-            <MudTextField @bind-Value="service.AufwandsZeit" Label="Aufwandszeit (hh:mm:ss)" Required="true" />
-            <MudTextField @bind-Value="service.Preis" Label="Preis" Required="true" />
-
-            <br />
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Style="border-radius:8px; min-width:140px; margin-top:12px;">
                 Service hinzufügen
             </MudButton>
         </MudForm>

@@ -1,27 +1,29 @@
 ﻿@attribute [Authorize]
 @page "/kunde/view/{Id:guid}"
 
-<MudText Typo="Typo.h4">Kunde Details</MudText>
+<MudText Typo="Typo.h4" Class="mb-2" Style="font-weight:600; color:#1976d2;">Kunde Details</MudText>
 <br />
 
-<MudCard>
+<MudCard Style="border-radius:18px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0; max-width:480px;">
     <MudCardContent>
-        <MudText><b>Firmenname:</b> @kunde.Firmenname</MudText>
-        <MudText><b>Ansprechpartner:</b> @kunde.AnsprechpartnerVorname @kunde.AnsprechpartnerNachname</MudText>
-        <MudText><b>Telefonnummer:</b> @kunde.Tel</MudText>
-        <MudText><b>E-Mail:</b> @kunde.Email</MudText>
+        <MudText Class="mb-1"><b>Firmenname:</b> <span style="color:#1976d2;">@kunde.Firmenname</span></MudText>
+        <MudText Class="mb-1"><b>Ansprechpartner:</b> @kunde.AnsprechpartnerVorname @kunde.AnsprechpartnerNachname</MudText>
+        <MudText Class="mb-1"><b>Telefonnummer:</b> @kunde.Tel</MudText>
+        <MudText Class="mb-1"><b>E-Mail:</b> @kunde.Email</MudText>
 
-        <MudText Typo="Typo.h5">Adresse</MudText>
-        <MudText><b>Straße:</b> @kunde.Adresse.Strasse</MudText>
-        <MudText><b>Hausnummer:</b> @kunde.Adresse.Hausnummer</MudText>
-        <MudText><b>Ort:</b> @kunde.Adresse.Ort</MudText>
-        <MudText><b>PLZ:</b> @kunde.Adresse.PLZ</MudText>
-        <MudText><b>Land:</b> @kunde.Adresse.Land</MudText>
+        <MudDivider Class="my-2" />
+
+        <MudText Typo="Typo.h6" Class="mb-1" Style="font-weight:600;">Adresse</MudText>
+        <MudText Class="mb-1"><b>Straße:</b> @kunde.Adresse.Strasse</MudText>
+        <MudText Class="mb-1"><b>Hausnummer:</b> @kunde.Adresse.Hausnummer</MudText>
+        <MudText Class="mb-1"><b>Ort:</b> @kunde.Adresse.Ort</MudText>
+        <MudText Class="mb-1"><b>PLZ:</b> @kunde.Adresse.PLZ</MudText>
+        <MudText Class="mb-1"><b>Land:</b> @kunde.Adresse.Land</MudText>
     </MudCardContent>
 
-    <MudCardActions>
-        <MudButton Color="Color.Primary" OnClick="() => NavigateToEditKundePage()">Bearbeiten</MudButton>
-        <MudButton Color="Color.Error" OnClick="() => DeleteKunde()">Löschen</MudButton>
+    <MudCardActions Class="mt-2" Style="justify-content: flex-end;">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Style="border-radius:8px; min-width:100px;" OnClick="() => NavigateToEditKundePage()">Bearbeiten</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Outlined" Style="border-radius:8px; min-width:100px; margin-left:12px;" OnClick="() => DeleteKunde()">Löschen</MudButton>
     </MudCardActions>
 </MudCard>
 

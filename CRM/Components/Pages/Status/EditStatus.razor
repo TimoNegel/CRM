@@ -1,14 +1,14 @@
 ﻿@page "/status/edit"
 @attribute [Authorize(Roles = "Admin")]
 
-<MudPaper Class="pa-4" Elevation="4">
-    <MudText Typo="Typo.h5">CRM-Pipeline bearbeiten</MudText>
+<MudPaper Class="pa-4" Elevation="4" Style="width:100%; height:100%; border-radius:16px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; margin:0 auto; background:#fff;">
+    <MudText Typo="Typo.h5" Class="mb-2" Style="font-weight:600; color:#1976d2;">CRM-Pipeline bearbeiten</MudText>
 
     @foreach(var status in statusList)
     {
         <MudGrid Class="my-2">
             <MudItem xs="10">
-                <MudTextField @bind-Value="status.Name" Label="Statusname" Immediate="true" />
+                <MudTextField @bind-Value="status.Name" Label="Statusname" Immediate="true" Style="margin-bottom:0;" />
             </MudItem>
             <MudItem xs="2" Class="d-flex align-center">
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveStatus(status))" />
@@ -16,13 +16,13 @@
         </MudGrid>
     }
 
-    <MudButton OnClick="AddStatus" Color="Color.Primary" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add">
+    <MudButton OnClick="AddStatus" Color="Color.Primary" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" Style="border-radius:8px; min-width:140px; margin-bottom:14px;">
         Neuer Eintrag
     </MudButton>
 
     <MudDivider Class="my-4" />
 
-    <MudButton OnClick="Submit" Color="Color.Success" Variant="Variant.Filled">
+    <MudButton OnClick="Submit" Color="Color.Success" Variant="Variant.Filled" Style="border-radius:8px; min-width:140px;">
         Bearbeiten
     </MudButton>
 </MudPaper>

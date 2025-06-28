@@ -1,22 +1,21 @@
 ﻿@attribute [Authorize]
 @page "/service/view/{Id:guid}"
 
-<MudText Typo="Typo.h4">Service Details</MudText>
+<MudText Typo="Typo.h4" Class="mb-2" Style="font-weight:600; color:#1976d2;">Service Details</MudText>
 <br />
 
-<MudCard>
+<MudCard Style="border-radius:18px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0; max-width:480px;">
     <MudCardContent>
-        <MudText><b>Name:</b> @service.ServiceName</MudText>
-        <MudText><b>Aufwandszeit:</b> @service.AufwandsZeit</MudText>
-        <MudText><b>Preis:</b> @service.Preis €</MudText>
+        <MudText Class="mb-1"><b>Name:</b> <span style="color:#1976d2;">@service.ServiceName</span></MudText>
+        <MudText Class="mb-1"><b>Aufwandszeit:</b> @service.AufwandsZeit</MudText>
+        <MudText Class="mb-1"><b>Preis:</b> @service.Preis €</MudText>
     </MudCardContent>
 
-    <MudCardActions>
-        <MudButton Color="Color.Primary" OnClick="() => NavigateToEditServicePage()">Bearbeiten</MudButton>
-        <MudButton Color="Color.Error" OnClick="() => DeleteService()">Löschen</MudButton>
+    <MudCardActions Class="mt-2" Style="justify-content: flex-end;">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Style="border-radius:8px; min-width:100px;" OnClick="() => NavigateToEditServicePage()">Bearbeiten</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Outlined" Style="border-radius:8px; min-width:100px; margin-left:12px;" OnClick="() => DeleteService()">Löschen</MudButton>
     </MudCardActions>
 </MudCard>
-
 @code {
     [Parameter] public Guid Id { get; set; }
     private Service service = new Service();

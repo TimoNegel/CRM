@@ -1,17 +1,23 @@
 ﻿@attribute [Authorize]
 @page "/services/view"
 
-<MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => NavigateToCreateServicePage()">Service hinzufügen</MudButton>
+<MudButton Class="mb-8" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" Style="border-radius:10px; box-shadow:0 2px 8px #1976d21a;" OnClick="() => NavigateToCreateServicePage()">Service hinzufügen</MudButton>
 
-<MudDataGrid T="Service" Items="@servicesListe" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default" RowClick="@((context) => NavigateToViewServicePage(context.Item.Id))">
+<MudDataGrid T="Service"
+             Items="@servicesListe"
+             Filterable="true"
+             FilterMode="DataGridFilterMode.ColumnFilterMenu"
+             FilterCaseSensitivity="DataGridFilterCaseSensitivity.Default"
+             RowClick="@((context) => NavigateToViewServicePage(context.Item.Id))"
+             Style="border-radius:18px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0; background:#fff; margin:0 auto;">
     <Columns>
         <PropertyColumn Property="x => x.ServiceName" />
         <PropertyColumn Property="x => x.AufwandsZeit" />
         <PropertyColumn Property="x => x.Preis" />
         <TemplateColumn CellClass="d-flex justify-center">
             <CellTemplate Context="context">
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="() => NavigateToEditServicePage(context.Item.Id)" />
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteService(context.Item.Id)" />
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Style="margin-right:4px;" OnClick="() => NavigateToEditServicePage(context.Item.Id)" />
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="() => DeleteService(context.Item.Id)" />
             </CellTemplate>
         </TemplateColumn>
     </Columns>

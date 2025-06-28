@@ -2,29 +2,31 @@
 @attribute [Authorize(Roles = "Admin")]
 
 
-<MudText Typo="Typo.h4">Mitarbeiter Details</MudText>
+<MudText Typo="Typo.h4" Class="mb-2" Style="font-weight:600; color:#1976d2;">Mitarbeiter Details</MudText>
 <br />
 
-<MudCard>
+<MudCard Style="border-radius:18px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0; max-width:480px;">
     <MudCardContent>
-        <MudText><b>Vorname:</b> @mitarbeiter.Vorname</MudText>
-        <MudText><b>Nachname:</b> @mitarbeiter.Nachname</MudText>
-        <MudText><b>Team:</b> @mitarbeiter.Team.Name</MudText>
-        <MudText><b>Rolle:</b> @rolle</MudText>
-        <MudText><b>E-Mail:</b> @mitarbeiter.Email</MudText>
-        <MudText><b>Telefonnummer:</b> @mitarbeiter.Telefonnummer</MudText>
+        <MudText Class="mb-1"><b>Vorname:</b> <span style="color:#1976d2;">@mitarbeiter.Vorname</span></MudText>
+        <MudText Class="mb-1"><b>Nachname:</b> @mitarbeiter.Nachname</MudText>
+        <MudText Class="mb-1"><b>Team:</b> @mitarbeiter.Team.Name</MudText>
+        <MudText Class="mb-1"><b>Rolle:</b> @rolle</MudText>
+        <MudText Class="mb-1"><b>E-Mail:</b> @mitarbeiter.Email</MudText>
+        <MudText Class="mb-1"><b>Telefonnummer:</b> @mitarbeiter.Telefonnummer</MudText>
 
-        <MudText Typo="Typo.h5">Adresse</MudText>
-        <MudText><b>Straße:</b> @mitarbeiter.Adresse.Strasse</MudText>
-        <MudText><b>Hausnummer:</b> @mitarbeiter.Adresse.Hausnummer</MudText>
-        <MudText><b>Ort:</b> @mitarbeiter.Adresse.Ort</MudText>
-        <MudText><b>PLZ:</b> @mitarbeiter.Adresse.PLZ</MudText>
-        <MudText><b>Land:</b> @mitarbeiter.Adresse.Land</MudText>
+        <MudDivider Class="my-2" />
+
+        <MudText Typo="Typo.h6" Class="mb-1" Style="font-weight:600;">Adresse</MudText>
+        <MudText Class="mb-1"><b>Straße:</b> @mitarbeiter.Adresse.Strasse</MudText>
+        <MudText Class="mb-1"><b>Hausnummer:</b> @mitarbeiter.Adresse.Hausnummer</MudText>
+        <MudText Class="mb-1"><b>Ort:</b> @mitarbeiter.Adresse.Ort</MudText>
+        <MudText Class="mb-1"><b>PLZ:</b> @mitarbeiter.Adresse.PLZ</MudText>
+        <MudText Class="mb-1"><b>Land:</b> @mitarbeiter.Adresse.Land</MudText>
     </MudCardContent>
 
-    <MudCardActions>
-        <MudButton Color="Color.Primary" OnClick="() => NavigateToEditMitarbeiterPage()">Bearbeiten</MudButton>
-        <MudButton Color="Color.Error" OnClick="() => DeleteMitarbeiter()">Löschen</MudButton>
+    <MudCardActions Class="mt-2" Style="justify-content: flex-end;">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Style="border-radius:8px; min-width:100px;" OnClick="() => NavigateToEditMitarbeiterPage()">Bearbeiten</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Outlined" Style="border-radius:8px; min-width:100px; margin-left:12px;" OnClick="() => DeleteMitarbeiter()">Löschen</MudButton>
     </MudCardActions>
 </MudCard>
 

@@ -4,40 +4,39 @@
 @using CRM.Components.Pages.Service
 
 
-<MudDialog Class="pb-6 px-6">
+<MudDialog Class="pb-6 px-6" Style="max-width: 480px;">
     <DialogContent>
-        <MudText Typo="Typo.h4">Auftrag Details</MudText>
-        <br />
+        <MudText Typo="Typo.h4" Class="mb-2" Style="font-weight:600; color:#1976d2;">Auftrag Details</MudText>
 
-        <MudCard>
+        <MudCard Style="border-radius:18px; box-shadow:0 4px 24px #00000014,0 1.5px 4px #0000000a; border:1px solid #e0e0e0;">
             <MudCardContent>
-                <MudText><b>Auftragswert:</b> @auftrag.AuftragsValue €</MudText>
-                <MudText Style="cursor: pointer;" @onclick="@(() => OpenViewKunde(auftrag.Kunde))">
-                    <b>Kunde:</b> @auftrag.Kunde?.Firmenname
+                <MudText Class="mb-2" Style="font-size:1.1rem;">
+                    <b>Auftragswert:</b> <span style="color:#388e3c;">@auftrag.AuftragsValue €</span>
                 </MudText>
-
-                <MudText>
-                    <b>Status:</b> @statusText
+                <MudText Class="mb-2" Style="cursor:pointer; font-size:1.05rem;" @onclick="@(() => OpenViewKunde(auftrag.Kunde))">
+                    <b>Kunde:</b> <span style="color:#1976d2;">@auftrag.Kunde?.Firmenname</span>
                 </MudText>
-
-                <MudText>
+                <MudText Class="mb-2" Style="font-size:1.05rem;">
+                    <b>Status:</b> <span style="color:#ffa000;">@statusText</span>
+                </MudText>
+                <MudDivider Class="my-2" />
+                <MudText Class="mb-1" Style="font-size:1.05rem;">
                     <b>Services:</b>
                 </MudText>
-
-                @foreach(var service in auftrag.Services ?? Enumerable.Empty<Service>())
-                {
-                    <MudText Style="cursor: pointer;" @onclick="@(() => OpenViewService(service))">
-                        <b>Name:</b> @service.ServiceName <b>Value:</b> @service.Preis
-                    </MudText>
-                }
-
-
-
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    @foreach(var service in auftrag.Services ?? Enumerable.Empty<Service>())
+                    {
+                        <MudPaper Elevation="1" Class="pa-2" Style="border-radius:10px; background:#f8fafc; cursor:pointer; transition:box-shadow 0.2s;" @onclick="@(() => OpenViewService(service))">
+                            <span style="font-weight:600; color:#1976d2;">@service.ServiceName</span>
+                            <span style="float:right; color:#388e3c;"><b>@service.Preis €</b></span>
+                        </MudPaper>
+                    }
+                </div>
             </MudCardContent>
 
-            <MudCardActions>
-                <MudButton Color="Color.Primary" OnClick="() => NavigateToEditAuftragPage()">Bearbeiten</MudButton>
-                <MudButton Color="Color.Error" OnClick="() => DeleteAuftrag()">Löschen</MudButton>
+            <MudCardActions Class="mt-4" Style="justify-content: flex-end;">
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" Style="border-radius:8px; min-width:100px;" OnClick="() => NavigateToEditAuftragPage()">Bearbeiten</MudButton>
+                <MudButton Color="Color.Error" Variant="Variant.Outlined" Style="border-radius:8px; min-width:100px; margin-left:12px;" OnClick="() => DeleteAuftrag()">Löschen</MudButton>
             </MudCardActions>
         </MudCard>
     </DialogContent>
