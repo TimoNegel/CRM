@@ -15,11 +15,6 @@
     <MudTextField @bind-Value="mitarbeiter.Vorname" Label="Vorname" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Nachname" Label="Nachname" Required="true" />
 
-    <MudSelect @bind-Value="userRole" Label="Rolle" Required="true">
-        <MudSelectItem Value="@("Mitarbeiter")">Mitarbeiter</MudSelectItem>
-        <MudSelectItem Value="@("Admin")">Admin</MudSelectItem>
-    </MudSelect>
-
     <MudTextField @bind-Value="mitarbeiter.Email" Label="E-Mail" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Telefonnummer" Label="Telefonnummer" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Adresse.Strasse" Label="Straße" Required="true" />
@@ -27,6 +22,14 @@
     <MudTextField @bind-Value="mitarbeiter.Adresse.Ort" Label="Ort" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Adresse.PLZ" Label="PLZ" Required="true" />
     <MudTextField @bind-Value="mitarbeiter.Adresse.Land" Label="Land" Required="true" />
+
+    <MudSelect Class="mt-5" @bind-Value="userRole" Label="Rolle" Required="true">
+        <MudSelectItem Value="@("Mitarbeiter")">Mitarbeiter</MudSelectItem>
+        <MudSelectItem Value="@("Admin")">Admin</MudSelectItem>
+    </MudSelect>
+    <MudButton class="mt-2" OnClick="ChangeRolle" Variant="Variant.Filled" Color="Color.Primary">
+        Rolle ändern
+    </MudButton>
 
     <MudSelect @bind-Value="selectedTeam" Label="Team" Required="true">
         @foreach(var k in teamListe)
@@ -59,22 +62,41 @@
         using var context = DbFactory.CreateDbContext();
         teamListe = await context.Teams.ToListAsync();
         userListe = await context.Users.Include(x => x.Adresse).Include(x => x.Team).ToListAsync();
+
+
+        var user = await userManager.FindByIdAsync(mitarbeiter.Id);
+        if(user != null)
+        {
+            var currentRole = await userManager.GetRolesAsync(user);
+            userRole = currentRole[0];
+        }
     }
+    private async Task AddMitarbeiter()  
+    {  
+        mitarbeiter.IdGuid = Guid.NewGuid();  
+        mitarbeiter.Adresse.Id = Guid.NewGuid();  
 
-    @code {  
-        private async Task AddMitarbeiter()  
-        {  
-            mitarbeiter.IdGuid = Guid.NewGuid();  
-            mitarbeiter.Adresse.Id = Guid.NewGuid();  
+        using var context = DbFactory.CreateDbContext();  
+        mitarbeiter.Team = context.Teams.FirstOrDefault(x => x.Id == selectedTeam.Id);  
+        context.Adressen.Add(mitarbeiter.Adresse);  
+        mitarbeiter.IsProfileComplete = true;
+        context.Users.Update(mitarbeiter);
+        try
+        {
+            await context.SaveChangesAsync();
+        } catch (Exception e)
+        {
+            throw e;
+        } 
 
-            using var context = DbFactory.CreateDbContext();  
-            mitarbeiter.Team = context.Teams.FirstOrDefault(x => x.Id == selectedTeam.Id);  
-            context.Adressen.Add(mitarbeiter.Adresse);  
-            mitarbeiter.IsProfileComplete = true;
-            context.Users.Update(mitarbeiter);  
-            await context.SaveChangesAsync();  
+            Navigation.NavigateTo($"/mitarbeiter/view");  
+        }  
 
-            var user = await userManager.FindByIdAsync(mitarbeiter.Id);  
+        private async Task ChangeRolle()
+        {
+            if(string.IsNullOrWhiteSpace(userRole))
+                return;
+            var user = await userManager.FindByIdAsync(mitarbeiter.Id);
             bool adminUserExists = await HasAnyAdminUserAsync();
 
             if(user != null)
@@ -88,14 +110,10 @@
 
                     await userManager.AddToRoleAsync(user, userRole);
 
-                    Navigation.NavigateTo($"/mitarbeiter/view");
-
                 }
             }
-
-            Navigation.NavigateTo($"/mitarbeiter/view");  
-        }  
-    }
+        }
+    
 
 
 
