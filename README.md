@@ -1,4 +1,4 @@
-## ⚙️ Installation & Setup
+### ⚙️ Installation & Setup
 
 Um dieses Projekt lokal auszuführen, folge den folgenden Schritten:  
 **WICHTIG:** Es ist nur auf Windows-Systemen möglich!
